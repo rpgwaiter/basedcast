@@ -1,9 +1,9 @@
 with import <nixpkgs> {};
-with pkgs.python3Packages;
+with pkgs.python37Packages;
 
 buildPythonPackage rec {
   name = "basedcast";
   src = ./api.py;
   #src = (fetchFromGitHub())
-  propagatedBuildInputs = [ pytest numpy pkgs.libsndfile ];
+  propagatedBuildInputs = [ mpd flask pkgs.libsndfile ];
 }
