@@ -5,8 +5,6 @@ from mpd import MPDClient
 from flask import Flask, Response
 from flask_cors import CORS
 
-
-
 # Flask Stuff
 api = Flask(__name__)
 CORS(api)
