@@ -10,7 +10,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'building main.rs'
-                sh 'rust main.rs'
+                sh 'rustc main.rs'
             }
         }
     }
