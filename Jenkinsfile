@@ -10,7 +10,12 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'building main.rs'
-                sh 'rustc main.rs'
+                sh '''
+                    #!/bin/bash -ex
+                    direnv allow .
+                    eval "$(direnv export bash)"
+                    rustc main.rs
+                '''
             }
         }
     }
