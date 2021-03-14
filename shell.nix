@@ -10,4 +10,6 @@ in
       latest.rustChannels.stable.rust
     ];
 
+    MPD_URL = "127.0.0.1";
+    MPD_PORT = "6600";
   }
