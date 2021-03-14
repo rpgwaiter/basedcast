@@ -14,7 +14,7 @@ pipeline {
                     #!/bin/bash -ex
                     direnv allow .
                     eval "$(direnv export bash)"
-                    rustc main.rs
+                    cargo build
                 '''
             }
         }
