@@ -1,9 +1,13 @@
-with import <nixpkgs> {};
-with pkgs.python3Packages;
+let
+  mozilla = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz);
+  nixpkgs = import <nixpkgs> { overlays = [ mozilla ]; };
+in
 
-buildPythonPackage rec {
-  name = "basedcast";
-  src = ./api.py;
-  #src = (fetchFromGitHub())
-  propagatedBuildInputs = [ mpd2 flask pkgs.libsndfile ];
-}
+  with nixpkgs;
+
+  mkShell {
+    buildInputs = [
+      latest.rustChannels.stable.rust
+    ];
+
+  }
