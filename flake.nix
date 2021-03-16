@@ -17,7 +17,7 @@
       rust = (mozilla.rustChannelOf {
         date = "2020-01-01"; # get the current date with `date -I`
         channel = "nightly";
-        sha256 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        sha256 = "sha256-dzN3TB8+Q1YGKntiWSFZqml0xWPHQPdScV0zGVjvRmk=";
       }).rust;
 
       # Override the version used in naersk
@@ -43,7 +43,7 @@
 
       devShell = pkgs.mkShell {
         # supply the specific rust version
-        nativeBuildInputs = [ rust postgresql.lib pkg-config ];
+        nativeBuildInputs = [ rust nixpkgs.postgresql.lib nixpkgs.pkg-config ];
       };
     });
 }
