@@ -15,7 +15,6 @@ version = "0.1.0"
 dependencies = [
  "diesel 1.4.6",
  "diesel_codegen",
- "dotenv 0.15.0",
  "mpd",
 ]
 
@@ -84,7 +83,7 @@ checksum = "22006237aee4465b49fb3a0248310a0aaefa6f165fc63c5f6e67810c63521c31"
 dependencies = [
  "diesel 0.16.0",
  "diesel_infer_schema",
- "dotenv 0.10.1",
+ "dotenv",
  "quote 0.3.15",
  "serde",
  "serde_json",
@@ -121,12 +120,6 @@ dependencies = [
  "error-chain",
  "regex",
 ]
-
-[[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
 
 [[package]]
 name = "error-chain"
