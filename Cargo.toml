@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 mpd = "*"
 diesel = { version = "1.4.4", features = ["postgres"] }
+envmnt = { version = "0.9.0" }
