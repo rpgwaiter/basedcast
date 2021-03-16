@@ -1,20 +1,24 @@
-let
-  mozilla = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz);
-  nixpkgs = import <nixpkgs> { overlays = [ mozilla ]; };
+# Latest Nightly
+with import <nixpkgs> {};
+let src = fetchFromGitHub {
+      owner = "mozilla";
+      repo = "nixpkgs-mozilla";
+      # commit from: 2019-05-15
+      rev = "9f35c4b09fd44a77227e79ff0c1b4b6a69dff533";
+      sha256 = "18h0nvh55b5an4gmlgfbvwbyqj91bklf1zymis6lbdh75571qaz0";
+   };
 in
+with import "${src.out}/rust-overlay.nix" pkgs pkgs;
+stdenv.mkDerivation {
+  name = "rust-env";
+  buildInputs = [
+    # Note: to use stable, just replace `nightly` with `stable`
+    latest.rustChannels.nightly.rust
 
-  with nixpkgs;
+    # Add some extra dependencies from `pkgs`
+    pkg-config openssl
+  ];
 
-  mkShell {
-    buildInputs = [
-      rustc cargo rustfmt gcc rustup
-      pkgconfig
-      stdenv.cc.cc
-    ];
-
-    shellHook = ''export CFG_DISABLE_CROSS_TESTS=1'';
-
-    LD_LIBRARY_PATH="${stdenv.cc.cc.lib}/lib64:$LD_LIBRARY_PATH";
-    MPD_URL = "127.0.0.1";
-    MPD_PORT = "6600";
-  }
+  # Set Environment Variables
+  RUST_BACKTRACE = 1;
+}
