@@ -1,6 +1,7 @@
 {
   inputs = {
     utils.url = "github:numtide/flake-utils";
+    nixos.url = "nixpkgs/release-20.09";
     naersk.url = "github:nmattia/naersk";
     mozillapkgs = {
       url = "github:mozilla/nixpkgs-mozilla";
@@ -8,7 +9,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, naersk, mozillapkgs }:
+  outputs = { self, nixpkgs, utils, naersk, nixos, mozillapkgs }:
     utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages."${system}";
 
@@ -43,7 +44,7 @@
 
       devShell = pkgs.mkShell {
         # supply the specific rust version
-        nativeBuildInputs = [ rust nixpkgs.postgresql.lib nixpkgs.pkg-config ];
+        nativeBuildInputs = [ rust nixos.postgresql.lib nixos.pkg-config ];
       };
     });
 }
