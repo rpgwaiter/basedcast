@@ -9,6 +9,7 @@ in
     buildInputs = [
       latest.rustChannels.stable.rust
       rls
+      rustup
     ];
 
     shellHook = ''export CFG_DISABLE_CROSS_TESTS=1'';
