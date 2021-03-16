@@ -8,6 +8,7 @@ in
   mkShell {
     buildInputs = [
       latest.rustChannels.stable.rust
+      rls
     ];
 
     MPD_URL = "127.0.0.1";
