@@ -11,6 +11,8 @@ in
       rls
     ];
 
+    shellHook = ''export CFG_DISABLE_CROSS_TESTS=1'';
+
     MPD_URL = "127.0.0.1";
     MPD_PORT = "6600";
   }
