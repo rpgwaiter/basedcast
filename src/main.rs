@@ -1,8 +1,6 @@
 extern crate mpd;
 #[macro_use]
 extern crate diesel;
-#[macro_use]
-extern crate diesel_codegen;
 
 use mpd::Client;
 use std::net::TcpStream;
