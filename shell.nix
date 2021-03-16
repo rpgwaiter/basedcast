@@ -7,9 +7,7 @@ in
 
   mkShell {
     buildInputs = [
-      latest.rustChannels.stable.rust
-      rls
-      rustup
+      rustc cargo rustfmt gcc
     ];
 
     shellHook = ''export CFG_DISABLE_CROSS_TESTS=1'';
