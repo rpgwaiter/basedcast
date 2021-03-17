@@ -44,11 +44,6 @@
       devShell = pkgs.mkShell {
         # supply the specific rust version
         nativeBuildInputs = [ rust pkgs.postgresql.lib pkgs.pkg-config ];
-
-        MPD_URL = "192.168.69.111";
-        MPD_PORT = "6600";
-        DATABASE_URL = ''postgres://radio:radio@192.168.69.111/radio'';
-
       };
     });
 }

@@ -3,3 +3,4 @@ main
 target**
 .idea
 result
+.env
