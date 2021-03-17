@@ -27,26 +27,28 @@
       };
     in rec {
       # `nix build`
-      packages.my-project = naersk-lib.buildPackage {
-        pname = "my-project";
+      packages.basedcast = naersk-lib.buildPackage {
+        pname = "basedcast";
         root = ./.;
       };
-      defaultPackage = packages.my-project;
+      defaultPackage = packages.basedcast;
 
       # `nix run`
-      apps.my-project = utils.lib.mkApp {
-        drv = packages.my-project;
+      apps.basedcast = utils.lib.mkApp {
+        drv = packages.basedcast;
       };
-      defaultApp = apps.my-project;
+      defaultApp = apps.basedcast;
 
       # `nix develop`
 
       devShell = pkgs.mkShell {
         # supply the specific rust version
         nativeBuildInputs = [ rust pkgs.postgresql.lib pkgs.pkg-config ];
+
         MPD_URL = "192.168.69.111";
         MPD_PORT = "6600";
-        DATABASE_URL = "postgres://radio:radio@192.168.69.111/radio";
+        DATABASE_URL = ''postgres://radio:radio@192.168.69.111/radio'';
+
       };
     });
 }
