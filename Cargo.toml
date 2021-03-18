@@ -2,11 +2,11 @@
 name = "basedcast"
 version = "0.1.0"
 authors = ["Rpgwaiter <rpgwaiter+git@based.zone>"]
-edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 mpd = "*"
-diesel = { version = "1.4.4", features = ["postgres"] }
+diesel = { version = "1.4.4", features = ["postgres", "numeric"] }
 envmnt = { version = "0.9.0" }
+dotenv = { version = "0.15.0" }

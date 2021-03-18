@@ -43,7 +43,7 @@
 
       devShell = pkgs.mkShell {
         # supply the specific rust version
-        nativeBuildInputs = [ rust pkgs.postgresql.lib pkgs.pkg-config ];
+        nativeBuildInputs = [ rust pkgs.postgresql.lib pkgs.pkg-config pkgs.diesel-cli ];
       };
     });
 }
