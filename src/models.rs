@@ -2,55 +2,53 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
-use schema::media;
-use schema::media::dsl::media as all_media;
+use schema::songs;
+use schema::songs::dsl::songs as all_songs;
 
-#[derive(Queryable, PartialEq, Debug)]
-pub struct Media {
-    pub id: i32,
-    pub title: String,
-    pub system: String,
-    pub bitrate: i32,
-    pub duration: i32,
-    pub filesize: i32,
-    pub filename: String,
-    pub fullpath: String,
-    pub is_public: bool
+#[derive(Queryable, Identifiable, AsChangeset, PartialEq, Debug)]
+pub struct Song {
+    pub id:        i32,
+    pub title:     String,
+    pub system:    Option<String>,
+    pub is_public: bool,
+    pub bitrate:   i32,
+    pub duration:  i32,
+    pub filesize:  i32,
+    pub filename:  String,
+    pub fullpath:  String,
 }
 
-#[derive(Insertable)]
-#[table_name = "media"]
-pub struct NewMedia {
-    pub id: i32,
-    pub title: String,
-    pub system: String,
-    pub bitrate: i32,
-    pub duration: i32,
-    pub filesize: i32,
-    pub filename: String,
-    pub fullpath: String,
-    pub is_public: bool
+#[derive(Debug, Insertable)]
+#[table_name = "songs"]
+pub struct NewSong<'a> {
+    pub title:     &'a String,
+    pub system:    Option<&'a String>,
+    pub is_public: &'a bool,
+    pub bitrate:   &'a i32,
+    pub duration:  &'a i32,
+    pub filesize:  &'a i32,
+    pub filename:  &'a String,
+    pub fullpath:  &'a String,
 }
 
-impl Media {
-    pub fn show(id: i32, conn: &PgConnection) -> Vec<Media> {
-        all_media
+impl Song {
+    pub fn show(id: i32, conn: &PgConnection) -> Vec<Song> {
+        all_songs
             .find(id)
-            .load::<Media>(conn)
-            .expect("Error loading media")
+            .load::<Song>(conn)
+            .expect("Error loading song")
     }
 
-    pub fn all(conn: &PgConnection) -> Vec<Media> {
-        all_media
-            .order(media::id.desc())
-            .load::<Media>(conn)
-            .expect("Error loading all media")
+    pub fn all(conn: &PgConnection) -> Vec<Song> {
+        all_songs
+            .order(songs::id.desc())
+            .load::<Song>(conn)
+            .expect("Error loading all songs")
     }
-    pub fn update_by_id(id: i32, conn: &PgConnection, media: NewMedia) -> bool {
-        use schema::media::dsl::{ title as t, system as s, bitrate as br, duration as d,
+    pub fn update_by_id(id: i32, conn: &PgConnection, song: NewSong) -> bool {
+        use schema::songs::dsl::{ title as t, system as s, bitrate as br, duration as d,
             filesize as fs, filename as n, fullpath as f, is_public as p };
-        let NewMedia {
-            id,
+        let NewSong {
             title,
             system,
             bitrate,
@@ -59,12 +57,12 @@ impl Media {
             filename,
             fullpath,
             is_public
-        } = media;
+        } = song;
 
-        diesel::update(all_media.find(id))
+        diesel::update(all_songs.find(id))
         .set((
             t.eq(title),
-            s.eq(system),
+            s.eq(system.unwrap()),
             br.eq(bitrate),
             d.eq(duration),
             fs.eq(filesize),
@@ -72,28 +70,28 @@ impl Media {
             f.eq(fullpath),
             p.eq(is_public)
         ))
-        .get_result::<Media>(conn)
+        .get_result::<Song>(conn)
         .is_ok()
     }
 
-    pub fn insert(media: NewMedia, conn: &PgConnection) -> bool {
-        diesel::insert_into(media::table)
-            .values(&media)
+    pub fn insert(song: NewSong, conn: &PgConnection) -> bool {
+        diesel::insert_into(songs::table)
+            .values(&song)
             .execute(conn)
             .is_ok()
     }
 
     pub fn delete_by_id(id: i32, conn: &PgConnection) -> bool {
-        if Media::show(id, conn).is_empty() {
+        if Song::show(id, conn).is_empty() {
             return false;
         }
-        diesel::delete(all_media.find(id)).execute(conn).is_ok()
+        diesel::delete(all_songs.find(id)).execute(conn).is_ok()
     }
 
-    pub fn all_on_system(system: String, conn: &PgConnection) -> Vec<Media> {
-        all_media
-            .filter(media::system.eq(system))
-            .load::<Media>(conn)
-            .expect("Error loading media")
+    pub fn all_on_system(system: String, conn: &PgConnection) -> Vec<Song> {
+        all_songs
+            .filter(songs::system.eq(system))
+            .load::<Song>(conn)
+            .expect("Error loading songs")
     }
 }

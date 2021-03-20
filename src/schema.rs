@@ -1,13 +1,13 @@
 table! {
-    media (id) {
+    songs (id) {
         id -> Int4,
-        title -> Varchar,
-        system -> Varchar,
+        title -> Text,
+        system -> Nullable<Text>,
         is_public -> Bool,
-        bitrate -> Nullable<Int4>,
-        duration -> Nullable<Numeric>,
+        bitrate -> Int4,
+        duration -> Int4,
         filesize -> Int4,
-        filename -> Varchar,
-        fullpath -> Varchar,
+        filename -> Text,
+        fullpath -> Text,
     }
 }

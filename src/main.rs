@@ -26,18 +26,30 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("Please set DATABASE_URL in your .env");
     let pg = PgConnection::establish(&database_url).unwrap();
 
-    let medium = models::NewMedia {
-        title: String::from("test"),
-        system: String::from("Playstation"),
-        is_public: true,
-        bitrate: 123456,
-        duration: 4,
-        filesize: 1233456,
-        filename: String::from("1.mp3"),
-        fullpath: String::from("/mnt/public/Radio/khrip/playstation/1xtreme/1.mp3"),
+    // db filler
+    //let t = String::F
+
+    let institle = String::from("test");
+    let inssystem = String::from("Playstation");
+    let insis_public = true;
+    let insbitrate = 123456;
+    let insduration = 4;
+    let insfilesize = 123456;
+    let insfilename = String::from("1.mp3");
+    let insfullpath = String::from("/mnt/public/Radio/khrip/playstation/1xtreme/1.mp3");
+
+    let song = models::NewSong {
+        title:     &institle,
+        system:    Some(&inssystem),
+        is_public: &insis_public,
+        bitrate:   &insbitrate,
+        duration:  &insduration,
+        filesize:  &insfilesize,
+        filename:  &insfilename,
+        fullpath:  &insfullpath,
     };
 
-    if models::Media::insert(medium, &pg) {
+    if models::Song::insert(song, &pg) {
         println!("Added!");
     } else {
         println!("Failed!");
