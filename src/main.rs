@@ -43,7 +43,10 @@ fn main() {
     };
     mpc.volume(100).unwrap();
     mpc.play().unwrap();
-    radiofiles::get_radiofiles();
+
+    for s in &radiofiles::get_radiofiles(&env::var("RADIOFILES_ROOT").expect("Please set RADIOFILES_URL in your .env")) {
+        radiofiles::get_mediainfo(s);
+    };
 }
 
 // Folder Structure: /system/game name (year)/song1.wav

@@ -31,7 +31,6 @@ dependencies = [
  "globwalk",
  "id3",
  "mpd",
- "walkdir",
 ]
 
 [[package]]
