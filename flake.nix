@@ -40,10 +40,18 @@
       defaultApp = apps.basedcast;
 
       # `nix develop`
-
       devShell = pkgs.mkShell {
-        # supply the specific rust version
-        nativeBuildInputs = [ rust pkgs.postgresql.lib pkgs.pkg-config pkgs.diesel-cli ];
+        nativeBuildInputs = with pkgs;[
+          rust postgresql.lib
+          pkg-config
+          diesel-cli
+          ffmpeg
+          llvm
+          llvmPackages.libclang
+          stdenv.cc.libc
+          clang ];
+
+        LIBCLANG_PATH = "${pkgs.llvmPackages.libclang}/lib";
       };
     });
 }

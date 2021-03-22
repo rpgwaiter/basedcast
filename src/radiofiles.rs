@@ -1,26 +1,41 @@
-extern crate id3;
+extern crate metadata;
 extern crate globwalk;
 
-use std::path::Path;
-use self::id3::Tag;
+use std::path::PathBuf;
+use std::io;
+
 use self::globwalk::glob;
+use self::metadata::MediaFileMetadata;
 
+use models::NewSong;
 
-pub fn get_radiofiles(root: &str) -> Vec<Path> {
-
-    let ret: Vec<Path> = glob(&format!("{}/**/*.mp3", &root))
+pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
+    glob(&format!("{}/**/*.mp3", &root))
         .unwrap()
-        .map(|x| x.unwrap().path())
-        .collect();
-
-    return ret
+        .map(|x| x.unwrap().path().to_path_buf())
+        .collect()
 }
 
-pub fn get_mediainfo(path: &Path) {
-    println!("{:?}", path);
-        let tag = Tag::read_from_path(path).unwrap();
-        if let Some(title) = tag.title() {
-            println!("title: {}", title);
+pub fn get_mediainfo(file: &PathBuf) -> Result<MediaFileMetadata, io::Error>{
+    let build_media_file_metadata = |file: &PathBuf| -> io::Result<MediaFileMetadata> {
+        let mut meta = MediaFileMetadata::new(&file)?;
+        meta.include_checksum(true)?
+            .include_tags(true);
+        Ok(meta)
+    };
+    build_media_file_metadata(&file)
+}
+
+pub fn upsert_db(songs: Vec<PathBuf>) {
+    for s in songs {
+        let mut song = NewSong::default();
+        println!("{:#?}", &s);
+        let tags = get_mediainfo(&s).unwrap().tags;
+        for tag in tags {
+            if tag.0 == "title".to_string() {
+                song.title = tag.1;
+                println!("Found!: {:#?}", &song.title);
+            }
         }
-    
+    };
 }

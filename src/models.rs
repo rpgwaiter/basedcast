@@ -19,18 +19,18 @@ pub struct Song {
     pub fullpath:  String,
 }
 
-#[derive(Debug, Insertable)]
+#[derive(Debug, Insertable, Default)]
 #[table_name = "songs"]
-pub struct NewSong<'a> {
-    pub title:     &'a String,
-    pub game:      Option<&'a String>,
-    pub system:    Option<&'a String>,
-    pub is_public: &'a bool,
-    pub bitrate:   &'a i32,
-    pub duration:  &'a i32,
-    pub filesize:  &'a i32,
-    pub filename:  &'a String,
-    pub fullpath:  &'a String,
+pub struct NewSong {
+    pub title:     String,
+    pub game:      Option<String>,
+    pub system:    Option<String>,
+    pub is_public: bool,
+    pub bitrate:   i32,
+    pub duration:  i32,
+    pub filesize:  i32,
+    pub filename:  String,
+    pub fullpath:  String,
 }
 
 impl Song {

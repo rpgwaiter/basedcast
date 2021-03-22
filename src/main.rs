@@ -18,35 +18,15 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("Please set DATABASE_URL in your .env");
     let _pg = PgConnection::establish(&database_url).unwrap();
 
-    // let song = models::NewSong {
-    //     title:     &institle,
-    //     game:      Some(&insgame),
-    //     system:    Some(&inssystem),
-    //     is_public: &insis_public,
-    //     bitrate:   &insbitrate,
-    //     duration:  &insduration,
-    //     filesize:  &insfilesize,
-    //     filename:  &insfilename,
-    //     fullpath:  &insfullpath,
-    // };
-
-    // if models::Song::insert(song, &pg) {
-    //     println!("Added!");
-    // } else {
-    //     println!("Failed!");
-    // };
-    
     let mut mpc = mpdctl::mpd_connect().unwrap();
     match mpc.login("password") { // Auth with MPD server
         Ok(_client) => println!("Connected to MPD!"),
         Err(error) => panic!("Unable to connect to mpd: {:?}", error),
     };
     mpc.volume(100).unwrap();
-    mpc.play().unwrap();
+    mpc.play().unwrap(); 
 
-    for s in &radiofiles::get_radiofiles(&env::var("RADIOFILES_ROOT").expect("Please set RADIOFILES_URL in your .env")) {
-        radiofiles::get_mediainfo(s);
-    };
+    radiofiles::upsert_db(radiofiles::get_radiofiles(&env::var("RADIOFILES_ROOT").expect("Please set RADIOFILES_URL in your .env")));
 }
 
 // Folder Structure: /system/game name (year)/song1.wav
