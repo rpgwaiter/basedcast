@@ -9,7 +9,10 @@ use schema::songs::dsl::songs as all_songs;
 pub struct Song {
     pub id:        i32,
     pub title:     String,
+    pub track:     Option<i32>,
     pub game:      Option<String>,
+    pub artist:    Option<String>,
+    pub year:      i32,
     pub system:    Option<String>,
     pub is_public: bool,
     pub bitrate:   i32,
@@ -23,7 +26,10 @@ pub struct Song {
 #[table_name = "songs"]
 pub struct NewSong {
     pub title:     String,
+    pub track:     Option<i32>,
     pub game:      Option<String>,
+    pub artist:    Option<String>,
+    pub year:      i32,
     pub system:    Option<String>,
     pub is_public: bool,
     pub bitrate:   i32,
@@ -48,11 +54,16 @@ impl Song {
             .expect("Error loading all songs")
     }
     pub fn update_by_id(id: i32, conn: &PgConnection, song: NewSong) -> bool {
-        use schema::songs::dsl::{ title as t, game as g, system as s, bitrate as br, duration as d,
-            filesize as fs, filename as n, fullpath as f, is_public as p };
+        use schema::songs::dsl::{   title as t, track as tk, game as g, artist as a,
+                                    year as y,
+                                    system as s, bitrate as br, duration as d,
+                                    filesize as fs, filename as n, fullpath as f, is_public as p };
         let NewSong {
             title,
+            track,
             game,
+            artist,
+            year,
             system,
             bitrate,
             duration,
@@ -65,7 +76,10 @@ impl Song {
         diesel::update(all_songs.find(id))
         .set((
             t.eq(title),
+            tk.eq(track),
             g.eq(game.unwrap()),
+            a.eq(artist.unwrap()),
+            y.eq(year),
             s.eq(system.unwrap()),
             br.eq(bitrate),
             d.eq(duration),

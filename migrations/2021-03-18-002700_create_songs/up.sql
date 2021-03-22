@@ -2,7 +2,10 @@
 CREATE TABLE songs (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
+    track INT NULL,
     game TEXT NULL,
+    artist TEXT NULL,
+    year INT NOT NULL,
     system TEXT NULL,
     is_public BOOLEAN NOT NULL DEFAULT 't',
     bitrate INT NOT NULL,
