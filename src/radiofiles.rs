@@ -76,7 +76,7 @@ pub fn upsert_db(songs: Vec<PathBuf>, pg: &PgConnection) -> Option<String> {
     for s in songs {
         let mut song = NewSong::default();
         let mediainfo = get_mediainfo(&s).unwrap();
-        let tags = parse_tags(get_mediainfo(&s).unwrap().tags); // holds a bunch of info in a Vec<String, String>
+        let tags = parse_tags(get_mediainfo(&s).unwrap().tags);
         let parsed = parse_path(&s); // grabs (system, game, year)
 
         // ## MODEL ##
