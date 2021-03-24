@@ -1,5 +1,3 @@
-
-
 use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
@@ -111,7 +109,8 @@ impl Song {
         diesel::insert_into(songs::table)
             .values(&song)
             .on_conflict(song.hash)
-            .execute(&conn)
+            .do_nothing()
+            .execute(conn)
             .is_ok()
     }
 

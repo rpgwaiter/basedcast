@@ -4,22 +4,18 @@ extern crate regex;
 extern crate uuid;
 
 use std::path::PathBuf;
-use std::io;
-use std::env;
+use std::convert::TryFrom;
+use std::{io, env};
 
-use self::globwalk::glob;
 use self::metadata::MediaFileMetadata;
 use diesel::pg::PgConnection;
-
-use std::convert::TryFrom;
 
 use self::regex::Regex;
 
 use models::{NewSong, Song};
-use diesel::pg::upsert::*;
 
 pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
-    glob(&format!("{}/**/*.mp3", &root))
+    self::globwalk::glob(&format!("{}/**/*.mp3", &root))
         .unwrap()
         .map(|x| x.unwrap().path().to_path_buf())
         .collect()
