@@ -9,12 +9,13 @@ use std::env;
 
 use self::globwalk::glob;
 use self::metadata::MediaFileMetadata;
+use diesel::pg::PgConnection;
 
 use std::convert::TryFrom;
 
 use self::regex::Regex;
 
-use models::NewSong;
+use models::{NewSong, Song};
 use diesel::pg::upsert::*;
 
 pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
@@ -63,19 +64,19 @@ fn truncate_in_place(s: &mut String, max_chars: usize) {
     s.truncate(truncate(&s, max_chars).len())
 }
 
-fn parse_tags(tags: &str) -> (String, String, String) {
-    let artist = ""; let title = ""; let track = "";
+fn parse_tags(tags: Vec<(String, String)>) -> (String, String, i32) {
+    let artist = ""; let title = ""; let track = 0;
     for tag in tags {
         match tag.0.as_str() {
-            "artist" => artist = Some(tag.1),
-            "title"  => title = tag.1,
-            "track"  => track = Some( tag.1.parse::<i32>().unwrap() ),
+            "artist" => artist = &tag.1,
+            "title"  => title = &tag.1,
+            "track"  => track = tag.1.parse::<i32>().unwrap(),
             _ => (),
         }
-    } (artist, title, track)
+    } (artist.to_string(), title.to_string(), track)
 }
 
-pub fn upsert_db(songs: Vec<PathBuf>) -> Option<String> {
+pub fn upsert_db(songs: Vec<PathBuf>, pg: &PgConnection) -> Option<String> {
     for s in songs {
         let mut song = NewSong::default();
         let mediainfo = get_mediainfo(&s).unwrap();
@@ -84,9 +85,9 @@ pub fn upsert_db(songs: Vec<PathBuf>) -> Option<String> {
 
         // ## MODEL ##
         song.title = Option::as_ref(&mediainfo.title).unwrap().to_string();
-        song.track = &tags.2;
+        song.track = Some(tags.2);
         song.game = Some(parsed.1); //does this need to be optional? 
-        song.artist = Some(&tags.0);
+        song.artist = Some(tags.0);
         song.year = parsed.2;
         song.system = Some(parsed.0);
         song.is_public = true;
@@ -100,7 +101,7 @@ pub fn upsert_db(songs: Vec<PathBuf>) -> Option<String> {
 
         //println!("{:#?}", &mediainfo);
         println!("{:#?}", &song);
-        song.upsert()
+        Song::insert(song, &pg);
     }
     Some(format!("updated songs"))
 }

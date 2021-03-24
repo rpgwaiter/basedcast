@@ -16,7 +16,7 @@ fn main() {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("Please set DATABASE_URL in your .env");
-    let _pg = PgConnection::establish(&database_url).unwrap();
+    let pg = PgConnection::establish(&database_url).unwrap();
 
     let mut mpc = mpdctl::mpd_connect().unwrap();
     match mpc.login("password") { // Auth with MPD server
@@ -28,7 +28,7 @@ fn main() {
 
     let radiofiles = radiofiles::get_radiofiles(&env::var("RADIOFILES_ROOT").expect("Please set RADIOFILES_URL in your .env"));
 
-    println!("{}", radiofiles::upsert_db(radiofiles).unwrap());
+    println!("{}", radiofiles::upsert_db(radiofiles, &pg).unwrap());
 }
 
 // Folder Structure: /system/game name (year)/song1.wav
