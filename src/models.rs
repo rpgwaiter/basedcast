@@ -1,3 +1,5 @@
+
+
 use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
@@ -5,7 +7,8 @@ use diesel::pg::PgConnection;
 use schema::songs;
 use schema::songs::dsl::songs as all_songs;
 
-#[derive(Queryable, Identifiable, AsChangeset, PartialEq, Debug)]
+#[derive(Queryable, QueryableByName, Identifiable, AsChangeset, PartialEq, Debug)]
+#[table_name = "songs"]
 pub struct Song {
     pub id:        i32,
     pub title:     String,
@@ -20,6 +23,7 @@ pub struct Song {
     pub filesize:  i32,
     pub filename:  String,
     pub fullpath:  String,
+    pub hash:      uuid::Uuid,
 }
 
 #[derive(Debug, Insertable, Default)]
@@ -37,6 +41,7 @@ pub struct NewSong {
     pub filesize:  i32,
     pub filename:  String,
     pub fullpath:  String,
+    pub hash:      uuid::Uuid,
 }
 
 impl Song {
@@ -57,7 +62,8 @@ impl Song {
         use schema::songs::dsl::{   title as t, track as tk, game as g, artist as a,
                                     year as y,
                                     system as s, bitrate as br, duration as d,
-                                    filesize as fs, filename as n, fullpath as f, is_public as p };
+                                    filesize as fs, filename as n, fullpath as f, is_public as p,
+                                    hash as h };
         let NewSong {
             title,
             track,
@@ -70,7 +76,8 @@ impl Song {
             filesize,
             filename,
             fullpath,
-            is_public
+            is_public,
+            hash
         } = song;
 
         diesel::update(all_songs.find(id))
@@ -86,7 +93,8 @@ impl Song {
             fs.eq(filesize),
             n.eq(filename),
             f.eq(fullpath),
-            p.eq(is_public)
+            p.eq(is_public),
+            h.eq(hash)
         ))
         .get_result::<Song>(conn)
         .is_ok()
@@ -96,6 +104,14 @@ impl Song {
         diesel::insert_into(songs::table)
             .values(&song)
             .execute(conn)
+            .is_ok()
+    }
+
+    pub fn upsert(song: NewSong, conn: &PgConnection) -> bool {
+        diesel::insert_into(songs::table)
+            .values(&song)
+            .on_conflict(song.hash)
+            .execute(&conn)
             .is_ok()
     }
 

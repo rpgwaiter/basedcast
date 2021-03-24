@@ -13,5 +13,6 @@ table! {
         filesize -> Int4,
         filename -> Text,
         fullpath -> Text,
+        hash -> Uuid,
     }
 }

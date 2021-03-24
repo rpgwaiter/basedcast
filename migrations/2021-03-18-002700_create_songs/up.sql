@@ -12,5 +12,6 @@ CREATE TABLE songs (
     duration INT NOT NULL, -- Will need to be converted to int from mediainfo's decimal
     filesize INT NOT NULL,
     filename TEXT NOT NULL,
-    fullpath TEXT NOT NULL
+    fullpath TEXT NOT NULL,
+    hash UUID NOT NULL
 )
