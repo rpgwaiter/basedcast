@@ -4,3 +4,4 @@ target**
 .idea
 result
 .env
+.vscode
