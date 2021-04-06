@@ -6,6 +6,8 @@ use std::env;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
+use models::{NewSong, Song};
+
 
 mod schema;
 mod models;
@@ -26,9 +28,21 @@ fn main() {
     mpc.volume(100).unwrap();
     mpc.play().unwrap(); 
 
-    let radiofiles = radiofiles::get_radiofiles(&env::var("RADIOFILES_ROOT").expect("Please set RADIOFILES_URL in your .env"));
+    let radiofiles = radiofiles::get_radiofiles(
+        &env::var("RADIOFILES_ROOT").expect("Set RADIOFILES_ROOT")
+    );
 
-    println!("{}", radiofiles::upsert_db(radiofiles, &pg).unwrap());
+    radiofiles::upsert_db(radiofiles, &pg).unwrap(); // scan files
+
+    // for song in Song::all(&pg) {
+    //     let title = song.title.to_string();
+    //     let path: &str = &song.fullpath.to_string();
+    //     &mpc.pl_push(&title, &path);
+    //     println!("pushed {:?}", &song.title);
+    // };
+
+    println!("{} Songs in the database. Starting scan...", &mpc.stats().unwrap().songs);
+    &mpc.rescan().unwrap();
 }
 
 // Folder Structure: /system/game name (year)/song1.wav

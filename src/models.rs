@@ -1,6 +1,7 @@
 use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
+use diesel::pg::upsert::on_constraint;
 
 use schema::songs;
 use schema::songs::dsl::songs as all_songs;
@@ -21,7 +22,7 @@ pub struct Song {
     pub filesize:  i32,
     pub filename:  String,
     pub fullpath:  String,
-    pub hash:      uuid::Uuid,
+    pub hash:      String, //use UUID at some point
 }
 
 #[derive(Debug, Insertable, Default)]
@@ -39,7 +40,7 @@ pub struct NewSong {
     pub filesize:  i32,
     pub filename:  String,
     pub fullpath:  String,
-    pub hash:      uuid::Uuid,
+    pub hash:      String,
 }
 
 impl Song {
@@ -98,17 +99,10 @@ impl Song {
         .is_ok()
     }
 
-    pub fn insert(song: NewSong, conn: &PgConnection) -> bool {
-        diesel::insert_into(songs::table)
-            .values(&song)
-            .execute(conn)
-            .is_ok()
-    }
-
     pub fn upsert(song: NewSong, conn: &PgConnection) -> bool {
         diesel::insert_into(songs::table)
             .values(&song)
-            .on_conflict(song.hash)
+            .on_conflict(on_constraint("song_hash"))
             .do_nothing()
             .execute(conn)
             .is_ok()

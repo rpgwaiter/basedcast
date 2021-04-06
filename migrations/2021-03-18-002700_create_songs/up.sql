@@ -13,5 +13,6 @@ CREATE TABLE songs (
     filesize INT NOT NULL,
     filename TEXT NOT NULL,
     fullpath TEXT NOT NULL,
-    hash UUID NOT NULL
-)
+    hash TEXT NOT NULL
+);
+ALTER TABLE songs ADD CONSTRAINT song_hash UNIQUE (hash)

@@ -1,7 +1,11 @@
 extern crate metadata;
 extern crate globwalk;
 extern crate regex;
-extern crate uuid;
+extern crate pbr;
+
+use self::pbr::ProgressBar;
+//use std::thread;
+//use self::pbr::MultiBar;
 
 use std::path::PathBuf;
 use std::convert::TryFrom;
@@ -38,66 +42,76 @@ fn parse_path(file: &PathBuf) -> (String, String, i32) {
 
     let mut splits = postprefix.split(|c| c == '/');
     let system = splits.next().unwrap();
-    
-    println!("System = {:#?}", &system);
+
     let ginput = splits.next().unwrap();
     let gex = Regex::new(r"(?P<game>.*)\((?P<year>\d{4})\)").unwrap(); //extract game and year from folder
     let rxout = gex.captures(&ginput).unwrap();
     
     (system.to_string(),
-    rxout["game"].to_string(), 
+    rxout["game"].trim().to_string(), 
     rxout["year"].parse().unwrap())
 }
 
-fn truncate(s: &str, max_chars: usize) -> &str {
-    match s.char_indices().nth(max_chars) {
-        None => s,
-        Some((idx, _)) => &s[..idx],
-    }
-}
+// fn truncate(s: &str, max_chars: usize) -> &str {
+//     match s.char_indices().nth(max_chars) {
+//         None => s,
+//         Some((idx, _)) => &s[..idx],
+//     }
+// }
 
-fn truncate_in_place(s: &mut String, max_chars: usize) {
-    s.truncate(truncate(&s, max_chars).len())
-}
+// fn truncate_in_place(s: &mut String, max_chars: usize) {
+//     s.truncate(truncate(&s, max_chars).len())
+// }
 
 fn parse_tags(tags: Vec<(String, String)>) -> (String, String, i32) {
-    let artist = ""; let title = ""; let track = 0;
+    let mut artist = String::new(); let mut title = String::new(); let mut track = 0;
     for tag in tags {
         match tag.0.as_str() {
-            "artist" => artist = &tag.1,
-            "title"  => title = &tag.1,
+            "artist" => artist.push_str(&tag.1),
+            "title"  => title.push_str(&tag.1),
             "track"  => track = tag.1.parse::<i32>().unwrap(),
             _ => (),
         }
-    } (artist.to_string(), title.to_string(), track)
+    } (artist, title, track)
+}
+
+fn fill_song(s: &PathBuf) -> NewSong {
+    let mut song = NewSong::default();
+    let mediainfo = get_mediainfo(&s).unwrap();
+    let tags = parse_tags(get_mediainfo(&s).unwrap().tags);
+    let parsed = parse_path(&s); // grabs (system, game, year)
+
+    // ## MODEL ##
+    song.title = Option::as_ref(&mediainfo.title).unwrap().to_string();
+    song.track = Some(tags.2);
+    song.game = Some(parsed.1); //does this need to be optional? 
+    song.artist = Some(tags.0);
+    song.year = parsed.2;
+    song.system = Some(parsed.0);
+    song.is_public = true;
+    song.bitrate =  if let Some(b) = mediainfo._bit_rate { b as i32 } else { 0 };
+    song.duration = if let Some(d) = mediainfo._duration { d as i32 } else { 0 };
+    song.filesize = i32::try_from(mediainfo.file_size).unwrap();
+    song.filename = mediainfo.file_name;
+    song.fullpath = mediainfo.path;
+    //song.hash = uuid::Uuid::parse_str(truncate(Option::as_ref(&mediainfo.hash).unwrap(), 32)).unwrap() /*as diesel::pg::types::sql_types::Uuid*/; // one liners are cool
+    song.hash = Option::as_ref( &mediainfo.hash ).unwrap().to_string();
+    // ## END MODEL ##
+
+    return song;
 }
 
 pub fn upsert_db(songs: Vec<PathBuf>, pg: &PgConnection) -> Option<String> {
+
+    //let mut mb = MultiBar::new();
+    let mut pb = ProgressBar::new(songs.iter().count() as u64);
+    pb.message("Scanning Song ");
+    pb.format("╢░🔥▌╟");
+
     for s in songs {
-        let mut song = NewSong::default();
-        let mediainfo = get_mediainfo(&s).unwrap();
-        let tags = parse_tags(get_mediainfo(&s).unwrap().tags);
-        let parsed = parse_path(&s); // grabs (system, game, year)
-
-        // ## MODEL ##
-        song.title = Option::as_ref(&mediainfo.title).unwrap().to_string();
-        song.track = Some(tags.2);
-        song.game = Some(parsed.1); //does this need to be optional? 
-        song.artist = Some(tags.0);
-        song.year = parsed.2;
-        song.system = Some(parsed.0);
-        song.is_public = true;
-        song.bitrate =  if let Some(b) = mediainfo._bit_rate { b as i32 } else { 0 };
-        song.duration = if let Some(d) = mediainfo._duration { d as i32 } else { 0 };
-        song.filesize = i32::try_from(mediainfo.file_size).unwrap();
-        song.filename = mediainfo.file_name;
-        song.fullpath = mediainfo.path;
-        song.hash = uuid::Uuid::parse_str(truncate(Option::as_ref(&mediainfo.hash).unwrap(), 32)).unwrap() /*as diesel::pg::types::sql_types::Uuid*/; // one liners are cool
-        // ## END MODEL ##
-
-        //println!("{:#?}", &mediainfo);
-        println!("{:#?}", &song);
-        Song::insert(song, &pg);
+        Song::upsert(fill_song(&s), &pg);
+        pb.inc();
     }
+    pb.finish_print("done");
     Some(format!("updated songs"))
 }
