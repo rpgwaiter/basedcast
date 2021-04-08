@@ -15,9 +15,9 @@
       # Get a specific rust version
       mozilla = pkgs.callPackage (mozillapkgs + "/package-set.nix") {};
       rust = (mozilla.rustChannelOf {
-        date = "2020-01-01"; # get the current date with `date -I`
+        date = "2021-04-07"; # get the current date with `date -I`
         channel = "nightly";
-        sha256 = "sha256-dzN3TB8+Q1YGKntiWSFZqml0xWPHQPdScV0zGVjvRmk=";
+        sha256 = "sha256-nNctka0FZJPECOcjc4m7lxjATAsfMcQ8Aasq96r3LoU=";
       }).rust;
 
       # Override the version used in naersk

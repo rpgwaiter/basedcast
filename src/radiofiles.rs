@@ -2,6 +2,7 @@ extern crate metadata;
 extern crate globwalk;
 extern crate regex;
 extern crate pbr;
+extern crate rayon;
 
 use self::pbr::ProgressBar;
 //use std::thread;
@@ -10,6 +11,8 @@ use self::pbr::ProgressBar;
 use std::path::PathBuf;
 use std::convert::TryFrom;
 use std::{io, env};
+use diesel::Connection;
+use self::rayon::prelude::*;
 
 use self::metadata::MediaFileMetadata;
 use diesel::pg::PgConnection;
@@ -75,8 +78,10 @@ fn parse_tags(tags: Vec<(String, String)>) -> (String, String, i32) {
     } (artist, title, track)
 }
 
-fn fill_song(s: &PathBuf) -> NewSong {
+fn fill_song(s: &PathBuf) { 
     let mut song = NewSong::default();
+    let database_url = env::var("DATABASE_URL").expect("Please set DATABASE_URL in your .env");
+    let pg = PgConnection::establish(&database_url).unwrap();
     let mediainfo = get_mediainfo(&s).unwrap();
     let tags = parse_tags(get_mediainfo(&s).unwrap().tags);
     let parsed = parse_path(&s); // grabs (system, game, year)
@@ -97,21 +102,26 @@ fn fill_song(s: &PathBuf) -> NewSong {
     //song.hash = uuid::Uuid::parse_str(truncate(Option::as_ref(&mediainfo.hash).unwrap(), 32)).unwrap() /*as diesel::pg::types::sql_types::Uuid*/; // one liners are cool
     song.hash = Option::as_ref( &mediainfo.hash ).unwrap().to_string();
     // ## END MODEL ##
-
-    return song;
+  
+    Song::upsert(song, &pg);
 }
 
-pub fn upsert_db(songs: Vec<PathBuf>, pg: &PgConnection) -> Option<String> {
+pub fn upsert_db(songs: Vec<PathBuf>, _pg: &PgConnection) -> Option<String> {
 
     //let mut mb = MultiBar::new();
     let mut pb = ProgressBar::new(songs.iter().count() as u64);
+
     pb.message("Scanning Song ");
     pb.format("╢░🔥▌╟");
 
-    for s in songs {
-        Song::upsert(fill_song(&s), &pg);
-        pb.inc();
-    }
-    pb.finish_print("done");
+    songs.par_iter().for_each(|p| fill_song(p) );
+
+    // for s in songs {
+    //     // Song::upsert(fill_song(&s), &pg);
+    //     // pb.inc();
+    //     pool.fill_song(s);
+
+    // }
+    //pb.finish_print("done");
     Some(format!("updated songs"))
 }

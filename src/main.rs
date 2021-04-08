@@ -6,13 +6,13 @@ use std::env;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
-use models::{NewSong, Song};
 
 
 mod schema;
 mod models;
 mod mpdctl;
 mod radiofiles;
+
 
 fn main() {
     dotenv().ok();
@@ -32,7 +32,7 @@ fn main() {
         &env::var("RADIOFILES_ROOT").expect("Set RADIOFILES_ROOT")
     );
 
-    radiofiles::upsert_db(radiofiles, &pg).unwrap(); // scan files
+    //radiofiles::upsert_db(radiofiles, &pg).unwrap(); // scan files
 
     // for song in Song::all(&pg) {
     //     let title = song.title.to_string();
@@ -41,8 +41,28 @@ fn main() {
     //     println!("pushed {:?}", &song.title);
     // };
 
-    println!("{} Songs in the database. Starting scan...", &mpc.stats().unwrap().songs);
-    &mpc.rescan().unwrap();
+    // fn collect(arguments: I) -> Vec<String> {
+    //     let mut output = Vec::<String>::new();
+    //     arguments.to_arguments::<_, ()>(&mut |arg| Ok(output.push(arg.to_string()))).unwrap();
+    //     output
+    // }
+    let mut query = mpd::Query::new();
+    let mut ugh = Vec::<String>::new();
+    let window: mpd::search::Window = (0u32, (radiofiles.len() as u32)).into();
+    let finished = query.and(mpd::Term::LastMod, "0");
+    //let gone = finished.to_arguments::<_, ()>(&mut |arg| Ok(ugh.push(arg.to_string()))).unwrap();
+
+
+    //println!("{} Songs in the database. Starting scan...", &output);
+    //&mpc.rescan().unwrap();
+
+    //&mpc.play(); 
+    // adds all songs to the queue
+    &mpc.find(finished, window).unwrap().iter().for_each(|x| {&mpc.push(x);});
+    // queue -> 'radio' playlist
+    &mpc.save("radio");
+    &mpc.play();
+    println!("Status: {:#?}", &mpc.status());
 }
 
 // Folder Structure: /system/game name (year)/song1.wav
