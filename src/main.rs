@@ -35,12 +35,12 @@ async fn main() -> Result<(), std::io::Error> {
                 .route(web::get().to(handlers::songs::index))
                 //.route(web::post().to(handlers::songs::create))
         )
-        .service(
-            web::resource("/songs/{id}")
-                .route(web::get().to(handlers::songs::show))
-                // .route(web::delete().to_async(handlers::songs::destroy))
-                // .route(web::patch().to_async(handlers::songs::update))
-        )
+        // .service(
+        //     web::resource("/songs/{id}")
+        //         .route(web::get().to(handlers::songs::show))
+        //         // .route(web::delete().to_async(handlers::songs::destroy))
+        //         // .route(web::patch().to_async(handlers::songs::update))
+        // )
     )
     .bind("127.0.0.1:8088").unwrap()
     .start();
