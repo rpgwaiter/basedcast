@@ -1,7 +1,11 @@
-.direnv
-main
-target**
-.idea
-result
-.env
-.vscode
+# Rust
+/target/
+**/*.rs.bk
+
+# Nix
+/result*
+/nix/result*
+
+# Direnv
+/.direnv
+/.envrc

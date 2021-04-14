@@ -2,67 +2,50 @@
 extern crate diesel;
 extern crate dotenv;
 
-use std::env;
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
-use dotenv::dotenv;
-
+#[macro_use]
+extern crate dotenv_codegen;
 
 mod schema;
 mod models;
 mod mpdctl;
 mod radiofiles;
 
+pub mod db;
+pub mod handlers;
 
-fn main() {
-    dotenv().ok();
+extern crate actix;
+extern crate actix_web;
 
-    let database_url = env::var("DATABASE_URL").expect("Please set DATABASE_URL in your .env");
-    let pg = PgConnection::establish(&database_url).unwrap();
+use actix_web::{App, HttpServer, web};
+use db::establish_connection;
 
-    let mut mpc = mpdctl::mpd_connect().unwrap();
-    match mpc.login("password") { // Auth with MPD server
-        Ok(_client) => println!("Connected to MPD!"),
-        Err(error) => panic!("Unable to connect to mpd: {:?}", error),
-    };
-    mpc.volume(100).unwrap();
-    mpc.play().unwrap(); 
+#[actix_rt::main]
+async fn main() -> Result<(), std::io::Error> {
+    let mut mpc = mpdctl::init().unwrap();
 
-    let radiofiles = radiofiles::get_radiofiles(
-        &env::var("RADIOFILES_ROOT").expect("Set RADIOFILES_ROOT")
-    );
+    println!("Status: {:#?}", &mpc.status().unwrap().state);
 
-    //radiofiles::upsert_db(radiofiles, &pg).unwrap(); // scan files
+    let sys = actix::System::new();
 
-    // for song in Song::all(&pg) {
-    //     let title = song.title.to_string();
-    //     let path: &str = &song.fullpath.to_string();
-    //     &mpc.pl_push(&title, &path);
-    //     println!("pushed {:?}", &song.title);
-    // };
+    HttpServer::new(move
+    || App::new()
+        .data(establish_connection())
+        .service(
+            web::resource("/songs")
+                .route(web::get().to(handlers::songs::index))
+                //.route(web::post().to(handlers::songs::create))
+        )
+        .service(
+            web::resource("/songs/{id}")
+                .route(web::get().to(handlers::songs::show))
+                // .route(web::delete().to_async(handlers::songs::destroy))
+                // .route(web::patch().to_async(handlers::songs::update))
+        )
+    )
+    .bind("127.0.0.1:8088").unwrap()
+    .start();
 
-    // fn collect(arguments: I) -> Vec<String> {
-    //     let mut output = Vec::<String>::new();
-    //     arguments.to_arguments::<_, ()>(&mut |arg| Ok(output.push(arg.to_string()))).unwrap();
-    //     output
-    // }
-    let mut query = mpd::Query::new();
-    let mut ugh = Vec::<String>::new();
-    let window: mpd::search::Window = (0u32, (radiofiles.len() as u32)).into();
-    let finished = query.and(mpd::Term::LastMod, "0");
-    //let gone = finished.to_arguments::<_, ()>(&mut |arg| Ok(ugh.push(arg.to_string()))).unwrap();
-
-
-    //println!("{} Songs in the database. Starting scan...", &output);
-    //&mpc.rescan().unwrap();
-
-    //&mpc.play(); 
-    // adds all songs to the queue
-    &mpc.find(finished, window).unwrap().iter().for_each(|x| {&mpc.push(x);});
-    // queue -> 'radio' playlist
-    &mpc.save("radio");
-    &mpc.play();
-    println!("Status: {:#?}", &mpc.status());
+    println!("Started http server: 127.0.0.1:8088");
+    let _ = sys.run();
+    
 }
-
-// Folder Structure: /system/game name (year)/song1.wav

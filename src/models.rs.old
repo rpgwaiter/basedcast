@@ -6,6 +6,7 @@ use diesel::pg::upsert::on_constraint;
 use schema::songs;
 use schema::songs::dsl::songs as all_songs;
 
+
 #[derive(Queryable, QueryableByName, Identifiable, AsChangeset, PartialEq, Debug)]
 #[table_name = "songs"]
 pub struct Song {
@@ -99,9 +100,9 @@ impl Song {
         .is_ok()
     }
 
-    pub fn upsert(song: NewSong, conn: &PgConnection) -> bool {
+    pub fn upsert(song: &NewSong, conn: &PgConnection) -> bool {
         diesel::insert_into(songs::table)
-            .values(&song)
+            .values(song)
             .on_conflict(on_constraint("song_hash"))
             .do_nothing()
             .execute(conn)
