@@ -1,22 +1,23 @@
-extern crate metadata;
-extern crate globwalk;
-extern crate regex;
-extern crate rayon;
-extern crate r2d2_postgres;
-extern crate r2d2;
+// This is used to update a running basedcast library
+// Eventually I'd like basedcast to scan for changes
+
+#[macro_use]
+extern crate dotenv_codegen;
 extern crate linya;
+extern crate rayon;
+extern crate metadata;
+extern crate regex;
+extern crate globwalk;
 
+use basedcast_core::mpdctl::mpd_connect;
+use basedcast_core::models::song::Song;
 use std::path::PathBuf;
-use std::convert::TryFrom;
-use std::{io, env};
-
+use std::{io, convert::TryFrom};
 use self::metadata::MediaFileMetadata;
-use crate::db::establish_connection;
-
-use crate::models::song::NewSong;
+use basedcast_core::db::establish_connection;
 
 pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
-    self::globwalk::glob(&format!("{}/**/*.mp3", &root))
+    globwalk::glob(&format!("{}/**/*.mp3", &root))
         .unwrap()
         .map(|x| x.unwrap().path().to_path_buf())
         .collect()
@@ -30,6 +31,18 @@ pub fn get_mediainfo(file: &PathBuf) -> Result<MediaFileMetadata, io::Error> {
         Ok(meta)
     };
     build_media_file_metadata(&file)
+}
+
+fn parse_tags(tags: Vec<(String, String)>) -> (String, String, i32) {
+    let mut artist = String::new(); let mut title = String::new(); let mut track = 0;
+    for tag in tags {
+        match tag.0.as_str() {
+            "artist" => artist.push_str(&tag.1),
+            "title"  => title.push_str(&tag.1),
+            "track"  => track = tag.1.parse::<i32>().unwrap(),
+            _ => (),
+        }
+    } (artist, title, track)
 }
 
 fn parse_path(file: &PathBuf) -> (String, String, i32) {
@@ -50,20 +63,8 @@ fn parse_path(file: &PathBuf) -> (String, String, i32) {
     rxout["year"].parse().unwrap())
 }
 
-fn parse_tags(tags: Vec<(String, String)>) -> (String, String, i32) {
-    let mut artist = String::new(); let mut title = String::new(); let mut track = 0;
-    for tag in tags {
-        match tag.0.as_str() {
-            "artist" => artist.push_str(&tag.1),
-            "title"  => title.push_str(&tag.1),
-            "track"  => track = tag.1.parse::<i32>().unwrap(),
-            _ => (),
-        }
-    } (artist, title, track)
-}
-
-fn fill_song_info(s: &PathBuf) -> NewSong { 
-    let mut song = NewSong::default();
+fn fill_song_info(s: &PathBuf) -> Song { 
+    let mut song = Song::default();
 
     let mediainfo = get_mediainfo(&s).unwrap();
     let tags = parse_tags(get_mediainfo(&s).unwrap().tags);
@@ -86,10 +87,10 @@ fn fill_song_info(s: &PathBuf) -> NewSong {
     song
 }
 
-pub fn upsert_db(songs: &Vec<PathBuf>) -> Option<String> {
+pub fn upsert_db(songs: &Vec<std::path::PathBuf>) -> Option<String> {
     use std::sync::{Arc, Mutex};
-    use self::linya::{Bar, Progress};
-    use self::rayon::prelude::*;
+    use linya::{Bar, Progress};
+    use rayon::prelude::*;
 
     let progress = Arc::new(Mutex::new(Progress::new()));
 
@@ -99,9 +100,33 @@ pub fn upsert_db(songs: &Vec<PathBuf>) -> Option<String> {
     );
 
     songs.par_iter().for_each_with(progress, |p, n| {
-        NewSong::upsert(&fill_song_info(n), &establish_connection().get().unwrap()).ok();
+        Song::upsert(&fill_song_info(n), &establish_connection().get().unwrap()).ok();
         p.lock().unwrap().inc_and_draw(&bar, 1);
     });
 
     Some(format!("updated songs"))
+}
+
+fn main() {
+    let mut mpc = mpd_connect().unwrap();
+    let radiofiles = get_radiofiles(dotenv!("RADIOFILES_ROOT"));
+
+    match mpc.login("password") { // Auth with MPD server
+        Ok(_client) => println!("Connected to MPD!"),
+        Err(error) => panic!("Unable to connect to mpd: {:?}", error),
+    };
+    mpc.volume(100).unwrap();
+
+    upsert_db(&radiofiles).unwrap(); // scan files into db
+
+    // Gather list of all songs mpd knows about
+    let mut query = mpd::Query::new();
+    let size = *&radiofiles.len() as u32;
+    let window: mpd::search::Window = (0u32, (size)).into();
+    let finished = query.and(mpd::Term::LastMod, "0");
+
+    // adds all songs to the queue
+    &mpc.find(finished, window).unwrap().iter().for_each(|x| {&mpc.push(x);});
+    // save queue as 'radio' playlist
+    println!("Scan complete: {:?}", mpc.save("radio")) // TODO: handle existing playlists
 }

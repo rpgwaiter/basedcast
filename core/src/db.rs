@@ -1,6 +1,5 @@
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
-use std::env;
 use diesel::r2d2::{ Pool, PooledConnection, ConnectionManager, PoolError };
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
@@ -14,7 +13,6 @@ fn init_pool(database_url: &str) -> Result<PgPool, PoolError> {
 pub fn establish_connection() -> PgPool {
     dotenv().ok();
 
-    let database_url = env::var("DATABASE_URL")
-        .expect("Error: Set DATABASE_URL");
+    let database_url = dotenv!("DATABASE_URL");
     init_pool(&database_url).expect("Failed to create pool")
 }
