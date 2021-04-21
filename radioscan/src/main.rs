@@ -127,6 +127,12 @@ fn main() {
 
     // adds all songs to the queue
     &mpc.find(finished, window).unwrap().iter().for_each(|x| {&mpc.push(x);});
-    // save queue as 'radio' playlist
-    println!("Scan complete: {:?}", mpc.save("radio")) // TODO: handle existing playlists
+    
+    // save queue as 'radio' playlist, del the old one
+    if mpc.playlist("radio").is_err() {
+        println!("Scan complete: {:?}", &mpc.save("radio"));
+    } else {
+        &mpc.pl_remove("radio");
+        println!("Scan complete: {:?}", &mpc.save("radio"));
+    }
 }
