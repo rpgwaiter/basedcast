@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: BasedCast Api
+  version: 0.1.0
+servers:
+  - url: http://localhost:8000/graphql
+    description: Dev
+  - url: https://api.based.radio
+    description: Live
+paths:
+  /songs:
+    get:
+      summary: Returns a list of songs
+      description: Optional extended description in CommonMark or HTML.
+      responses:
+        '200':    # status code
+          description: A JSON array of songs
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  title:
+                    type: string
+                  track:
+                    type: integer
+                  game:
+                    type: string
+                  artist:
+                    type: string
+                  year:
+                    type: integer
+                  system:
+                    type: string
+                  is_public:
+                    type: bool
+                  bitrate:
+                    type: integer
+                  duration:
+                    type: integer
+                  filesize:
+                    type: integer
+                  filename:
+                    type: string
+                  fullpath:
+                    type: string
+                  hash:
+                    type: string
+
+  /song/{id}:
+    get:
+      summary: Returns a song by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Parameter description in CommonMark or HTML.
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      responses: 
+        '200':
+          description: OK

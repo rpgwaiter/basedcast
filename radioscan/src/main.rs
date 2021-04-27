@@ -3,18 +3,20 @@
 
 #[macro_use]
 extern crate dotenv_codegen;
-extern crate linya;
 extern crate rayon;
 extern crate metadata;
 extern crate regex;
 extern crate globwalk;
+extern crate indicatif;
 
 use basedcast_core::mpdctl::mpd_connect;
-use basedcast_core::models::song::Song;
+use basedcast_api::db::models::song::{Song, NewSong};
 use std::path::PathBuf;
 use std::{io, convert::TryFrom};
 use self::metadata::MediaFileMetadata;
-use basedcast_core::db::establish_connection;
+use basedcast_api::db::connect;
+use basedcast_api::db::PgPool;
+
 
 pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
     globwalk::glob(&format!("{}/**/*.mp3", &root))
@@ -63,8 +65,8 @@ fn parse_path(file: &PathBuf) -> (String, String, i32) {
     rxout["year"].parse().unwrap())
 }
 
-fn fill_song_info(s: &PathBuf) -> Song { 
-    let mut song = Song::default();
+fn fill_song_info(s: &PathBuf) -> NewSong { 
+    let mut song = NewSong::default();
 
     let mediainfo = get_mediainfo(&s).unwrap();
     let tags = parse_tags(get_mediainfo(&s).unwrap().tags);
@@ -72,10 +74,10 @@ fn fill_song_info(s: &PathBuf) -> Song {
 
     song.title = Option::as_ref(&mediainfo.title).unwrap().to_string();
     song.track = Some(tags.2);
-    song.game = Some(parsed.1); //does this need to be optional? 
+    song.game = parsed.1; 
     song.artist = Some(tags.0);
     song.year = parsed.2;
-    song.system = Some(parsed.0);
+    song.system = parsed.0;
     song.is_public = true;
     song.bitrate =  if let Some(b) = mediainfo._bit_rate { b as i32 } else { 0 };
     song.duration = if let Some(d) = mediainfo._duration { d as i32 } else { 0 };
@@ -87,23 +89,24 @@ fn fill_song_info(s: &PathBuf) -> Song {
     song
 }
 
-pub fn upsert_db(songs: &Vec<std::path::PathBuf>) -> Option<String> {
-    use std::sync::{Arc, Mutex};
-    use linya::{Bar, Progress};
+pub fn upsert_db(songs: &Vec<std::path::PathBuf>, pgpool: &PgPool) -> Option<String> {
     use rayon::prelude::*;
+    use indicatif::{ ProgressBar, ProgressStyle };
 
-    let progress = Arc::new(Mutex::new(Progress::new()));
+    let sty = ProgressStyle::default_bar()
+        .template("{bar:40.green/yellow} {pos:>4}/{len:4} {msg}")
+        .progress_chars("=> ");
 
-    let bar: Bar = progress.lock().unwrap().bar(
-        songs.iter().count(),
-        format!("Scanning {} songs...", songs.iter().count())
-    );
+    let pb = ProgressBar::new(songs.len() as u64);
+    pb.set_style(sty);
+    pb.tick();
 
-    songs.par_iter().for_each_with(progress, |p, n| {
-        Song::upsert(&fill_song_info(n), &establish_connection().get().unwrap()).ok();
-        p.lock().unwrap().inc_and_draw(&bar, 1);
+    songs.par_iter().for_each(|songpath| {
+        let songinfo = fill_song_info(songpath);
+        Song::upsert(songinfo.clone(), &pgpool.get().unwrap()).ok();
+        pb.set_message(&format!("Scanned {:?}", songinfo.filename));
+        pb.inc(1);
     });
-
     Some(format!("updated songs"))
 }
 
@@ -116,8 +119,10 @@ fn main() {
         Err(error) => panic!("Unable to connect to mpd: {:?}", error),
     };
     mpc.volume(100).unwrap();
+    
+    let conn = connect();
 
-    upsert_db(&radiofiles).unwrap(); // scan files into db
+    upsert_db(&radiofiles, &conn).unwrap(); // scan files into db
 
     // Gather list of all songs mpd knows about
     let mut query = mpd::Query::new();
@@ -130,9 +135,11 @@ fn main() {
     
     // save queue as 'radio' playlist, del the old one
     if mpc.playlist("radio").is_err() {
-        println!("Scan complete: {:?}", &mpc.save("radio"));
+        &mpc.save("radio");
+        println!("{:?} songs scanned!", &radiofiles.len());
     } else {
         &mpc.pl_remove("radio");
-        println!("Scan complete: {:?}", &mpc.save("radio"));
+        &mpc.save("radio");
+        println!("{:?} songs scanned!", &radiofiles.len());
     }
 }

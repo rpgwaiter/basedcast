@@ -2,4 +2,7 @@
 # see diesel.rs/guides/configuring-diesel-cli
 
 [print_schema]
-file = "src/schema.rs"
+file = "api/src/db/schema.rs"
+with_docs = true
+import_types = ["diesel::sql_types::*", "basedcast_core::db::enums::*"]
+#patch_file = "api/src/db/schema.patch"

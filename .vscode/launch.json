@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Launch",
-            "program": "${workspaceRoot}/target/debug/basedcast",
+            "program": "${workspaceRoot}/target/debug/radioscan",
             "args": [ ],
             "cwd": "${workspaceRoot}"
         }

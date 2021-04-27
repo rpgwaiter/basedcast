@@ -2,12 +2,11 @@ extern crate mpd;
 
 pub use self::mpd::{Client, error::Error};
 use dotenv::dotenv;
-use std::env;
 
 pub fn mpd_connect() -> Result<Client, Error> {
     dotenv().ok();
-    let mpd_url = env::var("MPD_URL").expect("Set MPD_URL!");
-    let mpd_port = env::var("MPD_PORT").expect("Set MPD_PORT!");
+    let mpd_url = dotenv!("MPD_URL");
+    let mpd_port = dotenv!("MPD_PORT");
     let mpd_addr = format!("{}:{}", &mpd_url, &mpd_port);
     Client::connect(&mpd_addr)
 }
