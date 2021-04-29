@@ -27,17 +27,17 @@
       };
     in rec {
       # `nix build`
-      packages.basedcast = naersk-lib.buildPackage {
-        pname = "basedcast";
+      packages.basedcast-api = naersk-lib.buildPackage {
+        pname = "basedcast_api";
         root = ./.;
       };
-      defaultPackage = packages.basedcast;
+      defaultPackage = packages.basedcast-api;
 
       # `nix run`
-      apps.basedcast = utils.lib.mkApp {
-        drv = packages.basedcast;
+      apps.basedcast-api = utils.lib.mkApp {
+        drv = packages.basedcast-api;
       };
-      defaultApp = apps.basedcast;
+      defaultApp = apps.basedcast-api;
 
       # `nix develop`
       devShell = pkgs.mkShell {
