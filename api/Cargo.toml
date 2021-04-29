@@ -21,4 +21,5 @@ lazy_static = "1.4.0"
 
 [package.metadata.nix]
 build = true
+app = true
 library = true
