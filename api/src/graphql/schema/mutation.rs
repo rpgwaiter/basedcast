@@ -7,7 +7,7 @@ use crate::graphql::Context;
 pub struct Mutation {}
 
 juniper::graphql_object!(Mutation: Context |&self| {
-    field add_song(&executor, input: NewSongInput) -> FieldResult<SongObject> {
+    field addSong(&executor, input: NewSongInput) -> FieldResult<SongObject> {
         executor.context().add_song(input)
     }
 });

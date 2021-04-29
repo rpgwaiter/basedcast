@@ -48,8 +48,11 @@
           ffmpeg
           llvm
           llvmPackages.libclang
+          matrix-synapse
           stdenv.cc.libc
-          clang ];
+          clang
+          nodePackages.node2nix
+           ];
 
         LIBCLANG_PATH = "${pkgs.llvmPackages.libclang}/lib";
       };

@@ -7,14 +7,16 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        // Eventually there will be different steps for dev vs live
+        stage('Build api') {
             steps {
                 echo 'building main.rs'
                 sh '''
                     #!/bin/bash -ex
                     direnv allow .
                     eval "$(direnv export bash)"
-                    cargo build
+                    cp .env.example .env
+                    cargo build --bin api
                 '''
             }
         }

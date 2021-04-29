@@ -11,11 +11,11 @@ juniper::graphql_object!(Query: Context |&self| {
         "1.0"
     }
 
-    field song(&executor, id: String) -> FieldResult<SongObject> {
+    field songById(&executor, id: String) -> FieldResult<SongObject> {
         executor.context().get_song(&id)
     }
 
-    field song_by_hash(&executor, hash: String) -> FieldResult<SongObject> {
+    field songByHash(&executor, hash: String) -> FieldResult<SongObject> {
         executor.context().get_song_by_hash(&hash)
     }
 
