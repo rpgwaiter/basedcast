@@ -1,2 +1,8 @@
 [workspace]
 members = [ "core", "radioscan", "api" ]
+
+[workspace.metadata.nix]
+systems = ["x86_64-linux"]
+
+[workspace.metadata.nix.devshell]
+language.c.compiler = "clang"
