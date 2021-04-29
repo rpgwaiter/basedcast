@@ -3,7 +3,7 @@ members = [ "core", "radioscan", "api" ]
 
 [workspace.metadata.nix]
 systems = ["x86_64-linux"]
+cCompiler = "clang"
 
 [workspace.metadata.nix.devshell]
-language.c.compiler = "clang"
 packages = ["diesel-cli"]
