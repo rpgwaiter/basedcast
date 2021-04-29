@@ -10,9 +10,11 @@ pipeline {
         // Eventually there will be different steps for dev vs live
         stage('Build api') {
             steps {
-                echo 'building main.rs'
+                echo 'building basedcast api'
                 sh '''
                     #!/bin/bash -ex
+                    pwd
+                    ls -Alh
                     direnv allow .
                     eval "$(direnv export bash)"
                     cp .env.example .env
