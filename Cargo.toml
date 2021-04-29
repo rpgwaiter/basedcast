@@ -6,4 +6,4 @@ systems = ["x86_64-linux"]
 
 [workspace.metadata.nix.devshell]
 language.c.compiler = "clang"
-packages = ["matrix-synapse", "diesel-cli"]
+packages = ["diesel-cli"]
