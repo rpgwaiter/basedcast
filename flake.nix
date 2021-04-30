@@ -9,6 +9,6 @@
 
   outputs = inputs: inputs.nixCargoIntegration.lib.makeOutputs {
     root = ./.;
-    buildPlatform = "crate2nix";
+    # buildPlatform = "crate2nix";
   };
 }
