@@ -1,2 +1,9 @@
 [workspace]
 members = [ "core", "radioscan", "api" ]
+
+[workspace.metadata.nix]
+systems = ["x86_64-linux"]
+cCompiler = "clang"
+
+[workspace.metadata.nix.devshell]
+packages = ["diesel-cli"]
