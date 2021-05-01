@@ -15,13 +15,12 @@ pipeline {
             steps {
                 echo 'building radioscan'
                 sh '''
-                    #!/bin/bash -ex
                     pwd
                     ls -Alh
                     direnv allow .
                     eval "$(direnv export bash)"
                     cp settings.toml.example settings.toml
-                    nix build .#radioscan
+                    nix build .
                 '''
             }
         }
