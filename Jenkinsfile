@@ -2,7 +2,7 @@
 pipeline {
     agent {
         docker { 
-            image 'nixpkgs/nix-flake' 
+            image 'nixpkgs/nix-flakes' 
             args '-v $HOME:/root/basedcast'
         }
     }
