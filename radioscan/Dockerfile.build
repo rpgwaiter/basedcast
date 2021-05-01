@@ -7,4 +7,6 @@ FROM nixpkgs/nix-flakes
 RUN nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
 RUN nix-channel --update
 
+USER root
+
 # RUN nix build .#radioscan && ls result/
