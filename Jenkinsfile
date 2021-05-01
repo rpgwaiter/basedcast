@@ -17,8 +17,7 @@ pipeline {
             steps {
                 echo 'building radioscan'
                 sh '''
-                    ls -Alh
-                    pwd
+                    nix-env -iA nixos.nix-direnv
                     direnv allow .
                     eval "$(direnv export bash)"
                     cp settings.toml.example settings.toml
