@@ -17,6 +17,7 @@ pipeline {
             steps {
                 echo 'building radioscan'
                 sh '''
+                    #!/bin/bash -ex
                     #nix-env -iA nixpkgs.nix-direnv
                     #direnv allow .
                     #eval "$(direnv export bash)"
