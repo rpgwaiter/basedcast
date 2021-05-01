@@ -433,7 +433,6 @@ version = "0.1.0"
 dependencies = [
  "basedcast_core",
  "diesel",
- "dotenv",
  "itconfig",
  "juniper 0.14.2",
  "juniper_rocket",
@@ -972,35 +971,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
 
 [[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
-
-[[package]]
-name = "dotenv_codegen"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56966279c10e4f8ee8c22123a15ed74e7c8150b658b26c619c53f4a56eb4a8aa"
-dependencies = [
- "dotenv_codegen_implementation",
- "proc-macro-hack",
-]
-
-[[package]]
-name = "dotenv_codegen_implementation"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53e737a3522cd45f6adc19b644ce43ef53e1e9045f2d2de425c1f468abd4cf33"
-dependencies = [
- "dotenv",
- "proc-macro-hack",
- "proc-macro2 1.0.24",
- "quote 1.0.9",
- "syn 1.0.64",
-]
-
-[[package]]
 name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1530,7 +1500,6 @@ dependencies = [
  "console",
  "lazy_static",
  "number_prefix",
- "rayon",
  "regex",
 ]
 
@@ -2376,20 +2345,12 @@ version = "0.1.0"
 dependencies = [
  "basedcast_api",
  "basedcast_core",
- "diesel",
- "dotenv",
- "dotenv_codegen",
  "globwalk",
  "indicatif",
  "metadata",
  "mpd",
- "r2d2",
- "r2d2_postgres",
  "rayon",
  "regex",
- "serde",
- "serde_derive",
- "serde_json",
 ]
 
 [[package]]

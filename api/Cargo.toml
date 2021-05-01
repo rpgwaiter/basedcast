@@ -10,7 +10,6 @@ name = "basedcast_api"
 
 [dependencies]
 basedcast_core = { path = "../core" }
-dotenv = "0.15.0"
 itconfig = { version = "1", features = ["macro"] }
 rocket = "0.4.2"
 diesel = { version = "1.4.3", features = ["postgres", "r2d2"] }
