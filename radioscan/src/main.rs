@@ -1,8 +1,5 @@
 // This is used to update a running basedcast library
 // Eventually I'd like basedcast to scan for changes
-
-#[macro_use]
-extern crate dotenv_codegen;
 extern crate rayon;
 extern crate metadata;
 extern crate regex;
@@ -16,6 +13,7 @@ use std::{io, convert::TryFrom};
 use self::metadata::MediaFileMetadata;
 use basedcast_api::db::connect;
 use basedcast_api::db::PgPool;
+use basedcast_core::settings::load_config;
 
 
 pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
@@ -50,7 +48,11 @@ fn parse_tags(tags: Vec<(String, String)>) -> (String, String, i32) {
 fn parse_path(file: &PathBuf) -> (String, String, i32) {
     use self::regex::Regex;
 
-    let root = dotenv!("RADIOFILES_ROOT");
+    let conf = load_config();
+    let root = &conf
+        .get("mpd").unwrap()
+        .get("radiofiles_root").unwrap()
+        .as_str().unwrap();
     let postprefix = &file.to_str().unwrap().trim_start_matches(&format!("{}/", root));
 
     let mut splits = postprefix.split(|c| c == '/');
@@ -112,7 +114,12 @@ pub fn upsert_db(songs: &Vec<std::path::PathBuf>, pgpool: &PgPool) -> Option<Str
 
 fn main() {
     let mut mpc = mpd_connect().unwrap();
-    let radiofiles = get_radiofiles(dotenv!("RADIOFILES_ROOT"));
+    let conf = load_config();
+    let root = &conf
+        .get("mpd").unwrap()
+        .get("radiofiles_root").unwrap()
+        .as_str().unwrap();
+    let radiofiles = get_radiofiles(root);
 
     match mpc.login("password") { // Auth with MPD server
         Ok(_client) => println!("Connected to MPD!"),

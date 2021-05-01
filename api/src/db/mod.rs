@@ -1,10 +1,10 @@
-//use super::config;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use rocket::http::Status;
 use rocket::request::{self, FromRequest};
 use rocket::{Outcome, Request, State};
 use std::ops::Deref;
+use basedcast_core::settings::load_config;
 
 pub mod enums;
 pub mod models;
@@ -21,8 +21,12 @@ itconfig::config! {
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 
 pub fn connect() -> PgPool {
+    let connstr: String = load_config()
+        .get("db").unwrap()
+        .get("url").unwrap()
+        .as_str().unwrap().to_string();
     let manager =
-        ConnectionManager::<PgConnection>::new(config::DATABASE_URL());
+        ConnectionManager::<PgConnection>::new(connstr);
     Pool::new(manager).expect("Failed to create pool")
 }
 

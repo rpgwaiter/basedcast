@@ -1,14 +1,20 @@
 extern crate mpd;
 
 pub use self::mpd::{Client, error::Error};
-use dotenv::dotenv;
+
+use crate::settings::load_config;
 
 pub fn mpd_connect() -> Result<Client, Error> {
-    dotenv().ok();
-    // let mpd_url = dotenv!("MPD_URL");
-    // let mpd_port = dotenv!("MPD_PORT");
-    let mpd_port = 6600;
-    let mpd_url = "192.168.69.111";
+    let conf = load_config();
+
+    let mpd_url = &conf
+        .get("mpd").unwrap()
+        .get("url").unwrap()
+        .as_str().unwrap();
+    let mpd_port = &conf
+        .get("mpd").unwrap()
+        .get("port").unwrap()
+        .as_integer().unwrap();
     let mpd_addr = format!("{}:{}", &mpd_url, &mpd_port);
     Client::connect(&mpd_addr)
 }
