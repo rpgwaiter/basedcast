@@ -1,6 +1,9 @@
 #!/usr/bin/env groovy
 pipeline {
-    agent none
+    agent {
+        docker { image 'nixpkgs/nix-flake' }
+        args '-v $HOME:/root/basedcast'
+    }
 
     environment {
         PATH = "/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH" // Needed for NixOS
@@ -9,10 +12,6 @@ pipeline {
     stages {
         // Eventually there will be different steps for dev vs live
         stage('Build radioscan') {
-            agent {
-                docker { image 'nixpkgs/nix-flake' }
-                args '-v $HOME:/root/basedcast'
-            }
             steps {
                 echo 'building radioscan'
                 sh '''
