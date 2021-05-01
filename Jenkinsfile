@@ -18,10 +18,6 @@ pipeline {
                 echo 'building radioscan'
                 sh '''
                     #!/bin/bash -ex
-                    su root
-                    nix-channel --update
-                    nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
-                    nix-channel --update
                     cp settings.toml.example settings.toml
                     nix build .#radioscan
                 '''
