@@ -1,0 +1,10 @@
+[api]
+url = "http://localhost:8000/"
+
+[mpd]
+url = "localhost"
+port = 6600
+radiofiles_root = "/radiofiles"
+
+[db]
+url = "postgres://radio:radio@localhost/radio" 

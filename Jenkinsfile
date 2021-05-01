@@ -17,11 +17,11 @@ pipeline {
             steps {
                 echo 'building radioscan'
                 sh '''
-                    nix-env -iA nixpkgs.nix-direnv
-                    direnv allow .
-                    eval "$(direnv export bash)"
+                    #nix-env -iA nixpkgs.nix-direnv
+                    #direnv allow .
+                    #eval "$(direnv export bash)"
                     cp settings.toml.example settings.toml
-                    nix build .
+                    nix build .#radioscan
                 '''
             }
         }
