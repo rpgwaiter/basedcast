@@ -8,17 +8,20 @@ pipeline {
 
     stages {
         // Eventually there will be different steps for dev vs live
-        stage('Build api') {
+        stage('Build radioscan') {
+            agent {
+                docker { image 'nixpkgs/nix-flakes' }
+            }
             steps {
-                echo 'building basedcast api'
+                echo 'building radioscan'
                 sh '''
                     #!/bin/bash -ex
                     pwd
                     ls -Alh
                     direnv allow .
                     eval "$(direnv export bash)"
-                    cp .env.example .env
-                    cargo build --bin api
+                    cp settings.toml.example settings.toml
+                    nix build .#radioscan
                 '''
             }
         }
