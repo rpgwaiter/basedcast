@@ -10,11 +10,13 @@ pipeline {
         // Eventually there will be different steps for dev vs live
         stage('Build radioscan') {
             agent {
-                docker { image 'nixpkgs/nix-flakes' }
+                docker { image 'nixery.dev/shell' }
+                args '-v $HOME:/root/basedcast'
             }
             steps {
                 echo 'building radioscan'
                 sh '''
+                    cd /root/basedcast
                     pwd
                     ls -Alh
                     direnv allow .
