@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 pipeline {
-    agent { label 'master' }
+    agent none
 
     environment {
         PATH = "/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH" // Needed for NixOS
