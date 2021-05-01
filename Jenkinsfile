@@ -17,6 +17,7 @@ pipeline {
             steps {
                 echo 'building radioscan'
                 sh '''
+                    #!/run/current-system/sw/bin/bash
                     cd /root/basedcast
                     pwd
                     ls -Alh
