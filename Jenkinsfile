@@ -10,7 +10,7 @@ pipeline {
         // Eventually there will be different steps for dev vs live
         stage('Build radioscan') {
             agent {
-                docker { image 'nixery.dev/shell' }
+                docker { image 'nixpkgs/nix-flake' }
                 args '-v $HOME:/root/basedcast'
             }
             steps {
