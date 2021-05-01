@@ -7,9 +7,9 @@ pipeline {
         }
     }
 
-    environment {
-        PATH = "/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH" // Needed for NixOS
-    }
+    // environment {
+    //     PATH = "/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH" // Needed for NixOS
+    // }
 
     stages {
         // Eventually there will be different steps for dev vs live
