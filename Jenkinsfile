@@ -17,10 +17,8 @@ pipeline {
             steps {
                 echo 'building radioscan'
                 sh '''
-                    #!/bin/bash
-                    cd /root/basedcast
-                    pwd
                     ls -Alh
+                    pwd
                     direnv allow .
                     eval "$(direnv export bash)"
                     cp settings.toml.example settings.toml
