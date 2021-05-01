@@ -1,8 +1,10 @@
 #!/usr/bin/env groovy
 pipeline {
     agent {
-        docker { image 'nixpkgs/nix-flake' }
-        args '-v $HOME:/root/basedcast'
+        docker { 
+            image 'nixpkgs/nix-flake' 
+            args '-v $HOME:/root/basedcast'
+        }
     }
 
     environment {
