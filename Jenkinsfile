@@ -3,8 +3,7 @@ pipeline {
     agent {
         dockerfile { 
             dir 'radioscan'
-            filename 'Dockerfile.build'
-            image 'nixpkgs/nix-flakes' 
+            filename 'Dockerfile.build' 
         }
     }
 
