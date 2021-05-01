@@ -1,6 +1,5 @@
 FROM nixpkgs/nix-flakes
 
-
 COPY . /var/radioscan
 
 WORKDIR /var/radioscan
@@ -9,4 +8,3 @@ RUN nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
 RUN nix-channel --update
 
 RUN nix build .#radioscan && ls result/
-

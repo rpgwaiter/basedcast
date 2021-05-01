@@ -1,7 +1,9 @@
 #!/usr/bin/env groovy
 pipeline {
     agent {
-        docker { 
+        dockerfile { 
+            dir 'radioscan'
+            filename 'Dockerfile.build'
             image 'nixpkgs/nix-flakes' 
         }
     }
