@@ -5,8 +5,10 @@ use dotenv::dotenv;
 
 pub fn mpd_connect() -> Result<Client, Error> {
     dotenv().ok();
-    let mpd_url = dotenv!("MPD_URL");
-    let mpd_port = dotenv!("MPD_PORT");
+    // let mpd_url = dotenv!("MPD_URL");
+    // let mpd_port = dotenv!("MPD_PORT");
+    let mpd_port = 6600;
+    let mpd_url = "192.168.69.111";
     let mpd_addr = format!("{}:{}", &mpd_url, &mpd_port);
     Client::connect(&mpd_addr)
 }

@@ -4,6 +4,9 @@ pub extern crate dotenv;
 #[macro_use]
 pub extern crate dotenv_codegen;
 
+#[macro_use]
+pub extern crate toml;
+
 // extern crate log;
 // extern crate env_logger;
 
@@ -17,3 +20,4 @@ pub extern crate dotenv_codegen;
 // pub mod handlers;
 
 pub mod mpdctl;
+pub mod settings;

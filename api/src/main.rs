@@ -1,5 +1,7 @@
 use dotenv::dotenv;
 use basedcast_api::app;
+use basedcast_core::settings;
+
 
 itconfig::config! {
     DATABASE_URL: String,
@@ -10,7 +12,7 @@ itconfig::config! {
 }
 
 fn main() {
-    dotenv().ok();
-
+    //dotenv().ok();
+    println!("{:#?}", settings::load_config());
     app::init().launch();
 }
