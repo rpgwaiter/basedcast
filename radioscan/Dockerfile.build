@@ -5,7 +5,7 @@ FROM rustlang/rust:nightly
 # WORKDIR /var/radioscan
 
 RUN apt-get update && apt-get install -y libavutil-dev libgcc-7-dev \
-    libavformat-dev llvm-7-dev llvm-7-tools librust-clang-sys-dev ffmpeg
+    libavformat-dev llvm-7-dev librust-clang-sys-dev
 
 ENV LIBCLANG_PATH /usr/lib/llvm-7/lib/libclang.so
 
