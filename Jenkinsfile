@@ -4,6 +4,7 @@ pipeline {
         dockerfile { 
             dir 'radioscan'
             filename 'Dockerfile.build' 
+            args '-u 0:0'
         }
     }
 
