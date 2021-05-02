@@ -4,7 +4,8 @@ FROM rustlang/rust:nightly
 
 # WORKDIR /var/radioscan
 
-RUN apt-get update && apt-get install -y libavutil-dev libavformat-dev llvm-7-dev ffmpeg
+RUN apt-get update && apt-get install -y libavutil-dev \
+    libavformat-dev llvm-7-dev librust-clang-sys+clang-7-0-dev clang-7-dev ffmpeg
 
 
 # RUN nix build .#radioscan && ls result/
