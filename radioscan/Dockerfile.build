@@ -23,7 +23,7 @@ RUN apt-get update && \
     libswscale-dev \
     llvm-7-dev \
     libgcc-7-dev \
-    pkg-config \
+    pkg-config  && \
     rm -rf /var/lib/apt/lists/* && \
     curl -sSf https://sh.rustup.rs | sh -s -- -y
 
