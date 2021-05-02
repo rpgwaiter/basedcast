@@ -4,8 +4,28 @@ FROM rustlang/rust:nightly
 
 # WORKDIR /var/radioscan
 
-RUN apt-get update && apt-get install -y libavutil-dev libgcc-7-dev \
-    libavformat-dev llvm-7-dev librust-clang-sys-dev
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    clang \
+    curl \
+    ffmpeg \
+    git \
+    libavcodec-dev \
+    libavdevice-dev \
+    libavfilter-dev \
+    libavformat-dev \
+    libavresample-dev \
+    libavutil-dev \
+    libpostproc-dev \
+    libswresample-dev \
+    libswscale-dev \
+    llvm-7-dev \
+    libgcc-7-dev \
+    pkg-config \
+    rm -rf /var/lib/apt/lists/* && \
+    curl -sSf https://sh.rustup.rs | sh -s -- -y
 
 ENV LIBCLANG_PATH /usr/lib/llvm-7/lib/libclang.so
 
