@@ -11,7 +11,7 @@ pipeline {
         stage('Build radioscan') {
             agent {
                 dockerfile { 
-                    dir 'radiofiles'
+                    dir 'radioscan'
                     filename 'Dockerfile.build'
                 }
             }
