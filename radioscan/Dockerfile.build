@@ -24,8 +24,7 @@ RUN apt-get update && \
     llvm-7-dev \
     libgcc-7-dev \
     pkg-config  && \
-    rm -rf /var/lib/apt/lists/* && \
-    curl -sSf https://sh.rustup.rs | sh -s -- -y
+    rm -rf /var/lib/apt/lists/*
 
 ENV LIBCLANG_PATH /usr/lib/llvm-7/lib/libclang.so
 
