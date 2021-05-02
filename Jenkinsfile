@@ -18,7 +18,7 @@ pipeline {
                 sh '''
                     #!/bin/bash -ex
                     cp settings.toml.example settings.toml
-                    cargo build --release radioscan
+                    cargo build --release --bin radioscan
                 '''
             }
         }
