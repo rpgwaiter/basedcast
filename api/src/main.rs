@@ -1,6 +1,4 @@
 use basedcast_api::app;
-use basedcast_core::settings;
-
 
 itconfig::config! {
     DATABASE_URL: String,
