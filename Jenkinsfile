@@ -7,7 +7,6 @@ pipeline {
     // }
 
     stages {
-        // Eventually there will be different steps for dev vs live
         stage('Build radioscan') {
             agent {
                 dockerfile { 
@@ -21,6 +20,22 @@ pipeline {
                     #!/bin/bash -ex
                     cp settings.toml.example settings.toml
                     cargo build --release --bin radioscan
+                '''
+            }
+        }
+        stage('Build api') {
+            agent {
+                dockerfile { 
+                    dir 'api'
+                    filename 'Dockerfile.build'
+                }
+            }
+            steps {
+                echo 'building api'
+                sh '''
+                    #!/bin/bash -ex
+                    cp settings.toml.example settings.toml
+                    cargo build --release --bin basedcast_api
                 '''
             }
         }

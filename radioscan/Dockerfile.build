@@ -1,33 +1,9 @@
 FROM rustlang/rust:nightly
 
-# COPY . /var/radioscan
-
-# WORKDIR /var/radioscan
-
-
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    ca-certificates \
     clang \
     libclang-dev \
-    curl \
-    ffmpeg \
-    git \
-    libavcodec-dev \
-    libavdevice-dev \
-    libavfilter-dev \
-    libavformat-dev \
-    libavresample-dev \
-    libavutil-dev \
-    libpostproc-dev \
-    libswresample-dev \
-    libswscale-dev \
     llvm-7-dev \
-    libgcc-7-dev \
     pkg-config  && \
     rm -rf /var/lib/apt/lists/*
-
-ENV LIBCLANG_PATH /usr/lib/llvm-7/lib/libclang.so
-
-
-# RUN nix build .#radioscan && ls result/
