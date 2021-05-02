@@ -1,10 +1,8 @@
 #!/usr/bin/env groovy
 pipeline {
     agent {
-        dockerfile { 
-            dir 'radioscan'
-            filename 'Dockerfile.build' 
-            args '-u 0:0'
+        docker { 
+            image 'rustlang/rust'
         }
     }
 
@@ -20,7 +18,7 @@ pipeline {
                 sh '''
                     #!/bin/bash -ex
                     cp settings.toml.example settings.toml
-                    nix build .#radioscan
+                    cargo build --release radioscan
                 '''
             }
         }
