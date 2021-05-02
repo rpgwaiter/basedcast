@@ -8,7 +8,8 @@ FROM rustlang/rust:nightly
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
-    libclang-7-dev \
+    clang \
+    libclang-dev \
     curl \
     ffmpeg \
     git \
