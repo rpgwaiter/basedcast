@@ -2,7 +2,7 @@
 pipeline {
     agent {
         docker { 
-            image 'rustlang/rust'
+            image 'rustlang/rust:nightly'
         }
     }
 
