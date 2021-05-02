@@ -19,8 +19,6 @@ pipeline {
                 echo 'building radioscan'
                 sh '''
                     #!/bin/bash -ex
-                    find /usr -iname "libclang.so" -print
-                    export LIBCLANG_PATH="/usr/lib/llvm-7/lib/libclang.so:${LIBCLANG_PATH}"
                     cp settings.toml.example settings.toml
                     cargo build --release --bin radioscan
                 '''
