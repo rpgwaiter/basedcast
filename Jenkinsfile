@@ -17,6 +17,7 @@ pipeline {
                 echo 'building radioscan'
                 sh '''
                     #!/bin/bash -ex
+                    apt-get update && apt-get install -y ffmpeg
                     cp settings.toml.example settings.toml
                     cargo build --release --bin radioscan
                 '''
