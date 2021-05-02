@@ -13,7 +13,6 @@ pipeline {
                 dockerfile { 
                     dir 'radiofiles'
                     filename 'Dockerfile.build'
-                    label 'radioscan-builder'
                 }
             }
             steps {
