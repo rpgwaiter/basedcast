@@ -1,12 +1,10 @@
-FROM nixpkgs/nix-flakes
+FROM rustlang/rust:nightly
 
 # COPY . /var/radioscan
 
 # WORKDIR /var/radioscan
 
-RUN nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
-RUN nix-channel --update
+RUN apt-get update && apt-get install -y ffmpeg
 
-USER root
 
 # RUN nix build .#radioscan && ls result/
