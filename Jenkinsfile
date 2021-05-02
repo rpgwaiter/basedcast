@@ -26,7 +26,6 @@ pipeline {
         stage('Build api') {
             agent {
                 dockerfile { 
-                    dir 'api'
                     filename 'Dockerfile.build'
                 }
             }

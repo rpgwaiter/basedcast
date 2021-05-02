@@ -1,10 +1,5 @@
 FROM rustlang/rust:nightly
 
-# COPY . /var/radioscan
-
-# WORKDIR /var/radioscan
-
-
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
