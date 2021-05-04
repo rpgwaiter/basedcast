@@ -2,13 +2,13 @@
 pipeline {
     agent none
 
-    // environment {
-    //     //PATH = "/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH" // Needed for NixOS
-    //     // registry = 'rpgwaiter/basedcast'
-    //     // registryCredential = 'dockerhub'
-    //     // dockerImage = ''
+    environment {
+        //PATH = "/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH" // Needed for NixOS
+        registry = 'rpgwaiter/basedcast'
+        // registryCredential = 'dockerhub'
+        // dockerImage = ''
         
-    // }
+    }
 
     stages {
         stage('Build binaries') {
