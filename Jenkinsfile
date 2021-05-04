@@ -4,9 +4,9 @@ pipeline {
 
     environment {
         //PATH = "/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:$PATH" // Needed for NixOS
-        registry = 'rpgwaiter/basedcast'
-        registryCredential = 'dockerhub'
-        dockerImage = ''
+        // registry = 'rpgwaiter/basedcast'
+        // registryCredential = 'dockerhub'
+        // dockerImage = ''
         
     }
 
