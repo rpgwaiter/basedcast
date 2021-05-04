@@ -11,7 +11,7 @@ RUN apt-get update && \
 # 1b: Download and compile Rust dependencies (and store as a separate Docker layer)
 RUN USER=root cargo new myprogram
 WORKDIR /usr/src/myprogram
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml ./
 COPY radioscan/Cargo.toml radioscan/Cargo.lock radioscan/
 COPY core/Cargo.toml radioscan/Cargo.lock core/
 COPY api/Cargo.toml api/Cargo.lock api/
