@@ -1,5 +1,5 @@
 # 1: Build the exe
-FROM rust:nightly as builder
+FROM rustlang/rust:nightly as builder
 WORKDIR /usr/src
 
 # 1a: Prepare for static linking
