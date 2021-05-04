@@ -47,7 +47,7 @@ pipeline {
                 stage('Create Radioscan') {
                     steps {
                         script {
-                            docker.build(registry + ":$BUILD_NUMBER", "-f radioscan/Dockerfile .")
+                            docker.build(registry + ":$BUILD_NUMBER", ". -f radioscan/Dockerfile")
                         }
                     }
                 }
