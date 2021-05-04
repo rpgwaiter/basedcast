@@ -7,34 +7,32 @@ pipeline {
     // }
 
     stages {
-        stage('Build radioscan') {
-            agent {
-                dockerfile { 
-                    filename 'Dockerfile.build'
+        stage('Build binaries') {
+            agent { dockerfile { 
+                filename 'Dockerfile.build' 
+                args '-v /mnt/private/builds:/builds'
+            }}
+            stages {
+                stage('Radioscan') {
+                    steps {
+                        sh '''
+                            #!/bin/bash -ex
+                            cp settings.toml.example settings.toml
+                            cargo build --release --bin radioscan
+                            cp target/release/radioscan /builds/radioscan
+                        '''
+                    }
                 }
-            }
-            steps {
-                echo 'building radioscan'
-                sh '''
-                    #!/bin/bash -ex
-                    cp settings.toml.example settings.toml
-                    cargo build --release --bin radioscan
-                '''
-            }
-        }
-        stage('Build api') {
-            agent {
-                dockerfile {
-                    filename 'Dockerfile.build'
+                stage('Api') {
+                    steps {
+                        sh '''
+                            #!/bin/bash -ex
+                            cp settings.toml.example settings.toml
+                            cargo build --release --bin basedcast_api
+                            cp target/release/basedcast_api /builds/basedcast_api
+                        '''
+                    }
                 }
-            }
-            steps {
-                echo 'building api'
-                sh '''
-                    #!/bin/bash -ex
-                    cp settings.toml.example settings.toml
-                    cargo build --release --bin basedcast_api
-                '''
             }
         }
     }
