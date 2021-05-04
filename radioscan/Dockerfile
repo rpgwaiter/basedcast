@@ -21,11 +21,11 @@ RUN cargo install --target x86_64-unknown-linux-musl --path . --bin radioscan
 COPY core/src core/src/
 COPY api/src api/src/core
 COPY radioscan/src radioscan/src/
-RUN cargo install --target x86_64-unknown-linux-musl --path .
+RUN cargo install --target x86_64-unknown-linux-musl --path . --bin radioscan
 
 # 2: Copy the exe and extra files ("static") to an empty Docker image
 FROM scratch
-COPY --from=builder /usr/local/cargo/bin/myprogram .
+COPY --from=builder /usr/local/cargo/bin/radioscan .
 COPY static .
 USER 1000
-CMD ["./myprogram"]
+CMD ["./radioscan"]
