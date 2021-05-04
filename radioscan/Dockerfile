@@ -15,17 +15,16 @@ COPY Cargo.toml Cargo.lock ./
 COPY radioscan/Cargo.toml radioscan/
 COPY core/Cargo.toml core/
 COPY api/Cargo.toml api/
-RUN cargo install --target x86_64-unknown-linux-musl --path . --bin radioscan
+RUN cargo build --target x86_64-unknown-linux-musl --bin radioscan --release
 
 # 1c: Build the exe using the actual source code
 COPY core/src core/src/
 COPY api/src api/src/core
 COPY radioscan/src radioscan/src/
-RUN cargo install --target x86_64-unknown-linux-musl --path . --bin radioscan
+RUN cargo build --target x86_64-unknown-linux-musl --bin radioscan --release
 
-# 2: Copy the exe and extra files ("static") to an empty Docker image
+# 2: Copy the bin to an empty Docker image
 FROM scratch
-COPY --from=builder /usr/local/cargo/bin/radioscan .
-COPY static .
+COPY --from=builder /usr/src/basedcast/target/release/radioscan .
 USER 1000
 CMD ["./radioscan"]
