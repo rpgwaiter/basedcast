@@ -21,7 +21,8 @@ pipeline {
                     steps {
                         sh '''
                             #!/bin/bash -ex
-                            parallel cp -v settings.toml.example ::: /builds/settings.toml /builds/settings.toml
+                            cp -v settings.toml.example ./ /builds/settings.toml
+                            cp -v settings.toml.example ./settings.toml
                             cp settings.toml.example settings.toml
                             cargo build --release --bin radioscan
                             cp target/release/radioscan /builds/radioscan
