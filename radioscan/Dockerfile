@@ -9,9 +9,9 @@ RUN apt-get update && \
     rustup target add x86_64-unknown-linux-musl
 
 # 1b: Download and compile Rust dependencies (and store as a separate Docker layer)
-RUN USER=root cargo new myprogram
-WORKDIR /usr/src/myprogram
-COPY Cargo.toml ./
+RUN USER=root cargo new basedcast
+WORKDIR /usr/src/basedcast
+COPY Cargo.toml Cargo.lock ./
 COPY radioscan/Cargo.toml radioscan/Cargo.lock radioscan/
 COPY core/Cargo.toml radioscan/Cargo.lock core/
 COPY api/Cargo.toml api/Cargo.lock api/
