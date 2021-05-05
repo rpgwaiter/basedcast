@@ -18,9 +18,7 @@ COPY api/Cargo.toml api/
 RUN cargo build --target x86_64-unknown-linux-musl --bin radioscan --release
 
 # 1c: Build the exe using the actual source code
-COPY core/src core/src/
-COPY api/src api/src/core
-COPY radioscan/src radioscan/src/
+COPY ./ .
 RUN cargo build --target x86_64-unknown-linux-musl --bin radioscan --release
 
 # 2: Copy the bin to an empty Docker image
