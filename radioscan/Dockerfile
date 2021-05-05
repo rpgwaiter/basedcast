@@ -8,16 +8,9 @@ RUN apt-get update && \
     apt-get install -y musl-tools && \
     rustup target add x86_64-unknown-linux-musl
 
-# 1b: Download and compile Rust dependencies (and store as a separate Docker layer)
+# 1b: Build Radioscan
 RUN USER=root cargo new basedcast
 WORKDIR /usr/src/basedcast
-COPY Cargo.toml Cargo.lock ./
-COPY radioscan/Cargo.toml radioscan/
-COPY core/Cargo.toml core/
-COPY api/Cargo.toml api/
-RUN cargo build --target x86_64-unknown-linux-musl --bin radioscan --release
-
-# 1c: Build the exe using the actual source code
 COPY ./ .
 RUN cargo build --target x86_64-unknown-linux-musl --bin radioscan --release
 
