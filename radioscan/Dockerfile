@@ -1,21 +1,39 @@
-# 1: Build the exe
-FROM rustlang/rust:nightly as builder
-WORKDIR /usr/src
+# FROM lukemathwalker/cargo-chef as planner
+# WORKDIR /app
+# COPY . .
+# RUN cargo chef prepare --recipe-path recipe.json
 
-# 1a: Prepare for static linking
-RUN apt-get update && \
-    apt-get dist-upgrade -y && \
-    apt-get install -y musl-tools && \
-    rustup target add x86_64-unknown-linux-musl
+# FROM lukemathwalker/cargo-chef as cacher
+# WORKDIR /app
+# COPY --from=planner /app/recipe.json recipe.json
+# RUN cargo chef cook --release --recipe-path recipe.json
 
-# 1b: Build Radioscan
-RUN USER=root cargo new basedcast
-WORKDIR /usr/src/basedcast
+# FROM rustlang/rust:nightly as builder
+# WORKDIR /app
+# COPY . .
+# # Copy over the cached dependencies
+# COPY --from=cacher /app/target target
+# COPY --from=cacher $CARGO_HOME $CARGO_HOME
+# RUN rustup default nightly && rustup update && cargo build --release --bin radioscan
+
+# FROM rustlang/rust:nightly-alpine as runtime
+# WORKDIR /app
+# COPY --from=builder /app/target/release/radioscan /usr/local/bin
+# ENTRYPOINT ["/usr/local/bin/radioscan"]
+
+FROM nixpkgs/nix-flakes:nixos-20.09 AS builder
+WORKDIR /app
+
+RUN nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+RUN nix-channel --update
+
 COPY . .
-RUN cargo build --target x86_64-unknown-linux-musl --bin radioscan --release
 
-# 2: Copy the bin to an empty Docker image
-FROM scratch
-COPY --from=builder /usr/src/basedcast/target/release/radioscan .
-USER 1000
-CMD ["./radioscan"]
+RUN nix build .#radioscan
+
+FROM rust
+WORKDIR /app
+
+COPY --from=builder /app/result/bin/radioscan .
+COPY settings.toml .
+ENTRYPOINT ["/app/radioscan"]
