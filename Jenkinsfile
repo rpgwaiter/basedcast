@@ -47,7 +47,7 @@ pipeline {
                 stage('Create Radioscan') {
                     steps {
                         script {
-                            docker.build("rpgwaiter/basedcast:$BUILD_NUMBER", ". -f radioscan/Dockerfile -v /nix/store:/nix/store")
+                            docker.build("rpgwaiter/basedcast:$BUILD_NUMBER", ". -f radioscan/Dockerfile")
                         }
                     }
                 }

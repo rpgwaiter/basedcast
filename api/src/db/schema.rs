@@ -1,6 +1,5 @@
 table! {
     use diesel::sql_types::*;
-    //use basedcast_core::db::enums::*;
 
     /// Representation of the `songs` table.
     ///

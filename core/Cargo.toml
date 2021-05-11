@@ -13,6 +13,8 @@ mpd = "*"
 
 toml = "0.5"
 
+wasm-pack = "0.9.1"
+
 diesel = { version = "1.4.4", features = ["postgres", "r2d2"] }
 diesel-derive-enum = { version = "1", features = ["postgres"] }
 serde = { version = "1.0.80", features = ["derive"] }

@@ -1,9 +1,15 @@
 [workspace]
-members = [ "core", "radioscan", "api" ]
+members = [ "core", "radioscan", "api", "web" ]
 
 [workspace.metadata.nix]
 systems = ["x86_64-linux"]
 cCompiler = "clang"
 
 [workspace.metadata.nix.devshell]
-packages = ["diesel-cli"]
+packages = [
+    "diesel-cli", 
+    "cargo-make", 
+    "wasm-pack", 
+    "nodePackages.rollup",
+    "nodePackages.npm",
+    "cargo-generate"]

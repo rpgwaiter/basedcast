@@ -11,3 +11,4 @@ settings.toml
 /.direnv
 /.envrc
 .env
+*.old
