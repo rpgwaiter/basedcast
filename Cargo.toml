@@ -1,5 +1,5 @@
 [workspace]
-members = [ "core", "radioscan", "api", "web" ]
+members = [ "core", "radioscan", "api" ]
 
 [workspace.metadata.nix]
 systems = ["x86_64-linux"]
@@ -11,5 +11,10 @@ packages = [
     "cargo-make", 
     "wasm-pack", 
     "nodePackages.rollup",
-    "nodePackages.npm",
-    "cargo-generate"]
+    # "nodePackages.npm",
+    # "nodePackages.node2nix",
+    "cargo-generate",
+    "nodejs-16_x",
+    "yarn",
+    "yarn2nix"
+    ]
