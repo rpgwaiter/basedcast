@@ -3859,6 +3859,11 @@ coa@^2.0.2:
     chalk "^2.4.1"
     q "^1.1.2"
 
+codec-parser@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/codec-parser/-/codec-parser-0.2.0.tgz#6a8ac8a71dbb28959d348f9cb0515be3a4571839"
+  integrity sha512-9DtUaUIhgXp72EVzAnWCvVQD0qhw2X5CMArGKbFBqat4xqLs8OEuhFzZ1ynfmbISm2C6Up1T2cME7ZByklyGmA==
+
 collect-v8-coverage@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/collect-v8-coverage/-/collect-v8-coverage-1.0.1.tgz"
@@ -6196,6 +6201,25 @@ human-signals@^1.1.1:
   resolved "https://registry.npmjs.org/human-signals/-/human-signals-1.1.1.tgz"
   integrity sha512-SEQu7vl8KjNL2eoGBLF3+wAjpsNfA9XMlXAYj/3EdaNfAlxKthD1xjEQfGOUhllCGGJVNY34bRr6lPINhNjyZw==
 
+icecast-metadata-js@0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/icecast-metadata-js/-/icecast-metadata-js-0.5.3.tgz#79c9aba78554fbe97fefe41c772f820829ea2825"
+  integrity sha512-qSHG6ix6iq52en6JShZozWhpTODs2IX9vo43ksOiQVTB05uFFCI9c+++3WgYpRjE+4mwTquwfKkyLIDq6GV7zg==
+
+icecast-metadata-player@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/icecast-metadata-player/-/icecast-metadata-player-1.3.0.tgz#6a9766c5627f04c85d79e1461024628745437523"
+  integrity sha512-uz20ai13eulfirgEWx3NqFQ7CryLQ4DNUDblTm8fOHynx81N9PQg7p/D+sFYLoti8xDxMimUMd8Z4ZIfsspnTQ==
+  dependencies:
+    codec-parser "0.2.0"
+    icecast-metadata-js "0.5.3"
+    mse-audio-wrapper "1.3.0"
+
+iceplayer@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/iceplayer/-/iceplayer-3.0.0.tgz#4fbaa903c5de007364821f20e96d4b756da7c69f"
+  integrity sha512-3HUPWfLDwu4eMTxpTdnIygfTQAwMnHEzumLo7kBe72xioyblp7ZxClcPB2nQJdBnyTmjdIiIQKSDfTY845JNng==
+
 icojs@^0.14.0:
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/icojs/-/icojs-0.14.0.tgz#604a7515fb14734d49745f9ae22678176dc9d13a"
@@ -7939,6 +7963,13 @@ ms@2.1.2, ms@^2.1.1:
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
+mse-audio-wrapper@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/mse-audio-wrapper/-/mse-audio-wrapper-1.3.0.tgz#63fe42d97eba970d956960bce88feac27b3a109b"
+  integrity sha512-otO3MZe0LkV2kV69V1QJDlvoaP98WmTi589AyJA4e5GRCODJ9+59jkByiPHtcxdEnwLaLvJG8bC6ZB3NkEV2uA==
+  dependencies:
+    codec-parser "0.2.0"
+
 multicast-dns-service-types@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/multicast-dns-service-types/-/multicast-dns-service-types-1.1.0.tgz"
@@ -8036,6 +8067,11 @@ node-int64@^0.4.0:
   version "0.4.0"
   resolved "https://registry.npmjs.org/node-int64/-/node-int64-0.4.0.tgz"
   integrity sha1-h6kGXNs1XTGC2PlM4RGIuCXGijs=
+
+node-lame@1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/node-lame/-/node-lame-1.3.1.tgz#3200251dc8a363eec27a8de958d63d86c6a16210"
+  integrity sha512-MNt0XIpclhrU1rmGvD1az21UFeKhW4Ly7n4eogUQcIkGbRLrIArAqYRSe2p1fHJJKSRDqBymfr4j8xmCtzsWYQ==
 
 node-libs-browser@^2.2.1:
   version "2.2.1"

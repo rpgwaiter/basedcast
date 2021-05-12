@@ -16,5 +16,7 @@ packages = [
     "cargo-generate",
     "nodejs-16_x",
     "yarn",
-    "yarn2nix"
+    "yarn2nix",
+    "alsaLib",
+    "gnumake"
     ]

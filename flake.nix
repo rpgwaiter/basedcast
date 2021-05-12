@@ -14,22 +14,31 @@
         root = ./.;
         buildPlatform = "crate2nix";
         overrides = with pkgs; {
+          shell = common: prev: {
+            # Packages to be put in $PATH.
+            packages = prev.packages ++ [ alsaLib alsaLib.dev];
+            # Commands that will be shown in the `menu`. These also get added
+            # to packages.
+            commands = prev.commands ++ [
+              # { package = common.pkgs.git; }
+              # { name = "helloworld"; command = "echo 'Hello world'"; }
+            ];
+            # Environment variables to be exported.
+            env = prev.env ++ [
+            #   lib.nameValuePair "INCLUDE_PATH" ".:${alsaLib.dev}"
+              { name = "INCLUDE_PATH"; eval = ".:${alsaLib.dev}/include/asoundlib.h"; }
+            ];
+          };
           common = prev: {
-            buildInputs = prev.buildInputs ++ [ zlib openssl wasm-pack ];
+            buildInputs = prev.buildInputs ++ [ zlib openssl wasm-pack alsaLib alsaLib.dev  ];
 
-            nativeBuildInputs = prev.nativeBuildInputs ++ [ zlib ];
+            nativeBuildInputs = prev.nativeBuildInputs ++ [ zlib alsaLib alsaLib.dev ];
 
-            runtimeLibs = prev.runtimeLibs ++ [ zlib ];
+            runtimeLibs = prev.runtimeLibs ++ [ zlib alsaLib alsaLib.dev ];
           };
         };
       };
       pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux // rec {
-        nodePackages.create-react-app = inputs.nixpkgs.legacyPackages.x86_64-linux.nodePackages.create-react-app.override {
-          preRebuild = ''
-            substituteInPlace $(find -type f -name createReactApp.js) \
-                --replace "path.join(root, 'yarn.lock')" "path.join(root, 'yarn.lock')); fs.chmodSync(path.join(root, 'yarn.lock'), 0o644"
-          '';
-        };
       };
       mkContainer = drv:
         pkgs.dockerTools.buildImage rec {
@@ -56,7 +65,7 @@
         value = mkContainer drv;
       }) outputs.packages.x86_64-linux;
 
-
+      
     };
       #mapAttrs' mkContainer outputs.packages
 }
