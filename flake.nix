@@ -10,23 +10,16 @@
 
   outputs = inputs:
     let
+      api_url = "http://localhost:8000";
+      stream_url = "http://cast.based.radio/vgm.ogg";
       outputs = inputs.nixCargoIntegration.lib.makeOutputs {
         root = ./.;
         buildPlatform = "crate2nix";
         overrides = with pkgs; {
           shell = common: prev: {
-            # Packages to be put in $PATH.
-            packages = prev.packages ++ [ alsaLib alsaLib.dev];
-            # Commands that will be shown in the `menu`. These also get added
-            # to packages.
-            commands = prev.commands ++ [
-              # { package = common.pkgs.git; }
-              # { name = "helloworld"; command = "echo 'Hello world'"; }
-            ];
-            # Environment variables to be exported.
             env = prev.env ++ [
-            #   lib.nameValuePair "INCLUDE_PATH" ".:${alsaLib.dev}"
-              { name = "INCLUDE_PATH"; eval = ".:${alsaLib.dev}/include/asoundlib.h"; }
+              { name = "REACT_APP_API_URL"; eval = api_url; }
+              { name = "REACT_APP_STREAM_URL"; eval = stream_url; }
             ];
           };
           common = prev: {
@@ -52,20 +45,17 @@
     pkgs.lib.recursiveUpdate
     outputs {
       packages.x86_64-linux = {
-        basedcast_web = pkgs.yarn2nix-moretea.mkYarnPackage {
+        basedcast_web = pkgs.yarn2nix.mkYarnPackage {
             name = "basedcast_web";
             src = ./web;
             packageJSON = ./web/package.json;
             yarnLock = ./web/yarn.lock;
             yarnNix = ./web/yarn.nix;
-          };
-
-      } // pkgs.lib.mapAttrs' (name: drv: {
-        name = "${name}-container";
-        value = mkContainer drv;
-      }) outputs.packages.x86_64-linux;
-
-      
+        } // pkgs.lib.mapAttrs' (name: drv: {
+          name = "${name}-container";
+          value = mkContainer drv;
+        }) outputs.packages.x86_64-linux;
+      };
     };
       #mapAttrs' mkContainer outputs.packages
 }
