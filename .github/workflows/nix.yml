@@ -29,6 +29,9 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
         extraPullNames: nix-community
     -
+      name: 
+      run: 
+    -
       name: Copy config
       run: mv settings.toml.example settings.toml
     -
