@@ -6,6 +6,7 @@ settings.toml
 # Nix
 /result*
 /nix/result*
+.history
 
 # Direnv
 /.direnv
