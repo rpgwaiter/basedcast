@@ -9,14 +9,5 @@ cCompiler = "clang"
 packages = [
     "diesel-cli", 
     "cargo-make", 
-    "wasm-pack", 
-    "nodePackages.rollup",
-    # "nodePackages.npm",
-    # "nodePackages.node2nix",
     "cargo-generate",
-    "nodejs-16_x",
-    "yarn",
-    "yarn2nix",
-    "alsaLib",
-    "gnumake"
     ]

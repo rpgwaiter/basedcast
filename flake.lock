@@ -125,8 +125,7 @@
     "root": {
       "inputs": {
         "nixCargoIntegration": "nixCargoIntegration",
-        "nixpkgs": "nixpkgs",
-        "yarn2nix": "yarn2nix"
+        "nixpkgs": "nixpkgs"
       }
     },
     "rustOverlay": {
@@ -142,22 +141,6 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "yarn2nix": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1594908739,
-        "narHash": "sha256-tt/6Yt1kGfXZbfV8Ny9B166R5c4E78bo8BZEjWvpL3w=",
-        "owner": "nix-community",
-        "repo": "yarn2nix",
-        "rev": "37c3b7c1d1170ed6e063b804c4dbe871f4043349",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-community",
-        "repo": "yarn2nix",
         "type": "github"
       }
     }

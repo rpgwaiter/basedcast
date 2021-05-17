@@ -27,14 +27,14 @@
       mkContainer = drv:
         pkgs.dockerTools.buildImage rec {
           name = "${drv.name}";
-          config = {
-            Cmd = [ "${drv}/bin/${name}" ];
-          };
+          config.Cmd = [ "${drv}/bin/${name}" ];
         };
     in
     pkgs.lib.recursiveUpdate
-    outputs // pkgs.lib.mapAttrs' (name: drv: {
+    outputs { 
+      packages.x86_64-linux = pkgs.lib.mapAttrs' (name: drv: {
           name = "${name}-container";
           value = mkContainer drv;
         }) outputs.packages.x86_64-linux;
+    };
 }
