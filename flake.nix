@@ -5,6 +5,8 @@
       url = "github:yusdacra/nix-cargo-integration";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    devshell.url = "github:numtide/devshell";
+
   };
 
   outputs = inputs:
@@ -33,8 +35,8 @@
     pkgs.lib.recursiveUpdate
     outputs { 
       packages.x86_64-linux = pkgs.lib.mapAttrs' (name: drv: {
-          name = "${name}-container";
-          value = mkContainer drv;
-        }) outputs.packages.x86_64-linux;
+        name = "${name}-container";
+        value = mkContainer drv;
+      }) outputs.packages.x86_64-linux;
     };
 }

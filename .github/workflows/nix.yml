@@ -27,10 +27,7 @@ jobs:
       with:
         name: rpgwaiter
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-        extraPullNames: nix-community
-    -
-      name: 
-      run: 
+        extraPullNames: nix-community]
     -
       name: Copy config
       run: mv settings.toml.example settings.toml

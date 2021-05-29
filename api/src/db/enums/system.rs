@@ -1,5 +1,5 @@
-#[derive(Debug, PartialEq, DbEnum, Clone, GraphQLEnum)]
-#[PgType = "system_enum"]
+// #[derive(Debug, PartialEq, DbEnum, Clone, GraphQLEnum)]
+// #[PgType = "system_enum"]
 pub enum System {
     ThreeDo,
 	Amiga,

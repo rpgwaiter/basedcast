@@ -1,20 +1,21 @@
 // This is used to update a running basedcast library
 // Eventually I'd like basedcast to scan for changes
 extern crate rayon;
-extern crate metadata;
+extern crate id3;
+extern crate mp3_duration;
 extern crate regex;
 extern crate globwalk;
 extern crate indicatif;
+extern crate checksums;
+
 
 use basedcast_core::mpdctl::mpd_connect;
 use basedcast_api::db::models::song::{Song, NewSong};
 use std::path::PathBuf;
-use std::{io, convert::TryFrom};
-use self::metadata::MediaFileMetadata;
 use basedcast_api::db::connect;
 use basedcast_api::db::PgPool;
 use basedcast_core::settings::load_config;
-
+use self::id3::Tag;
 
 pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
     globwalk::glob(&format!("{}/**/*.mp3", &root))
@@ -23,37 +24,17 @@ pub fn get_radiofiles(root: &str) -> Vec<PathBuf> {
         .collect()
 }
 
-pub fn get_mediainfo(file: &PathBuf) -> Result<MediaFileMetadata, io::Error> {
-    let build_media_file_metadata = |file: &PathBuf| -> io::Result<MediaFileMetadata> {
-        let mut meta = MediaFileMetadata::new(&file)?;
-        meta.include_checksum(true)?
-            .include_tags(true);
-        Ok(meta)
-    };
-    build_media_file_metadata(&file)
-}
-
-fn parse_tags(tags: Vec<(String, String)>) -> (String, String, i32) {
-    let mut artist = String::new(); let mut title = String::new(); let mut track = 0;
-    for tag in tags {
-        match tag.0.as_str() {
-            "artist" => artist.push_str(&tag.1),
-            "title"  => title.push_str(&tag.1),
-            "track"  => track = tag.1.parse::<i32>().unwrap(),
-            _ => (),
-        }
-    } (artist, title, track)
-}
-
 fn parse_path(file: &PathBuf) -> (String, String, i32) {
     use self::regex::Regex;
 
     let conf = load_config();
-    let root = &conf
+
+    let radiofiles_dir = &conf
         .get("mpd").unwrap()
         .get("radiofiles_root").unwrap()
         .as_str().unwrap();
-    let postprefix = &file.to_str().unwrap().trim_start_matches(&format!("{}/", root));
+
+    let postprefix = &file.to_str().unwrap().trim_start_matches(&format!("{}/", radiofiles_dir));
 
     let mut splits = postprefix.split(|c| c == '/');
     let system = splits.next().unwrap();
@@ -67,27 +48,32 @@ fn parse_path(file: &PathBuf) -> (String, String, i32) {
     rxout["year"].parse().unwrap())
 }
 
-fn fill_song_info(s: &PathBuf) -> NewSong { 
+fn fill_song_info(s: &PathBuf) -> NewSong {
+    use std::str::FromStr;
     let mut song = NewSong::default();
-
-    let mediainfo = get_mediainfo(&s).unwrap();
-    let tags = parse_tags(get_mediainfo(&s).unwrap().tags);
+    
     let parsed = parse_path(&s); // grabs (system, game, year)
-
-    song.title = Option::as_ref(&mediainfo.title).unwrap().to_string();
-    song.track = Some(tags.2);
-    song.game = parsed.1; 
-    song.artist = Some(tags.0);
+    song.game = parsed.1;
     song.year = parsed.2;
     song.system = parsed.0;
     song.is_public = true;
-    song.bitrate =  if let Some(b) = mediainfo._bit_rate { b as i32 } else { 0 };
-    song.duration = if let Some(d) = mediainfo._duration { d as i32 } else { 0 };
-    song.filesize = i32::try_from(mediainfo.file_size).unwrap();
-    song.filename = mediainfo.file_name;
-    song.fullpath = mediainfo.path;
-    //song.hash = uuid::Uuid::parse_str(truncate(Option::as_ref(&mediainfo.hash).unwrap(), 32)).unwrap() /*as diesel::pg::types::sql_types::Uuid*/; // one liners are cool
-    song.hash = Option::as_ref( &mediainfo.hash ).unwrap().to_string();
+    song.duration = mp3_duration::from_path(&s).unwrap().as_millis() as i32;
+    song.filesize = std::fs::metadata(&s).unwrap().len() as i32;
+    song.bitrate = song.filesize - song.duration;
+    song.filename = s.file_name().unwrap().to_os_string().into_string().unwrap();
+    song.fullpath = s.to_str().unwrap().to_string();
+    song.hash = checksums::hash_file(&s, checksums::Algorithm::from_str("SHA3256").unwrap());
+    song.title = s.file_stem().unwrap().to_os_string().into_string().unwrap();
+    
+    let tags = Tag::read_from_path(&s);
+    match tags {
+        Ok(t) => {
+            if let Some(track) = t.track() { song.track = Some(track as i32) }
+            if let Some(artist) = t.artist() { song.artist = Some(artist.to_string()) }
+            if let Some(title) = t.title() { song.title = title.to_string() }
+        },
+        _ => (), // Do nothing if song is missing id3 tags
+    };
     song
 }
 
@@ -103,7 +89,7 @@ pub fn upsert_db(songs: &Vec<std::path::PathBuf>, pgpool: &PgPool) -> Option<Str
     pb.set_style(sty);
     pb.tick();
 
-    songs.par_iter().for_each(|songpath| {
+    songs.into_iter().for_each(|songpath| {
         let songinfo = fill_song_info(songpath);
         Song::upsert(songinfo.clone(), &pgpool.get().unwrap()).ok();
         pb.set_message(&format!("Scanned {:?}", songinfo.filename));
@@ -120,6 +106,8 @@ fn main() {
         .get("radiofiles_root").unwrap()
         .as_str().unwrap();
     let radiofiles = get_radiofiles(root);
+
+    println!("{:#?}",Tag::read_from_path(&radiofiles[0]).unwrap().artist());
 
     match mpc.login("password") { // Auth with MPD server
         Ok(_client) => println!("Connected to MPD!"),

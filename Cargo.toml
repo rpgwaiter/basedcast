@@ -10,5 +10,4 @@ packages = [
     "diesel-cli", 
     "cargo-make", 
     "cargo-generate",
-    "ffmpeg"
     ]
