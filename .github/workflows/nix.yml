@@ -32,6 +32,11 @@ jobs:
       name: Copy config
       run: mv settings.toml.example settings.toml
     -
+      name: use binary cache
+      run: |
+        echo 'substituters = https://cache.nixos.org https://cache.based.zone' | > $HOME/.config/nix.conf
+        echo 'trusted-public-keys = cache.based.lan:msKglvCzmqQJl48UudNb9TEZ5b2IxaeFbTLI8gg0c7I=' | > $HOME/.config/nix.conf
+    -
       name: Build radioscan
       run: nix build .#radioscan
     - 

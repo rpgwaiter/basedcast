@@ -19,9 +19,9 @@
           #   env = prev.env ++ [];
           # };
           common = prev: {
-            buildInputs = prev.buildInputs ++ [ zlib openssl wasm-pack ];
-            nativeBuildInputs = prev.nativeBuildInputs ++ [ zlib ];
-            runtimeLibs = prev.runtimeLibs ++ [ zlib ];
+            buildInputs = prev.buildInputs ++ [ openssl wasm-pack ];
+            nativeBuildInputs = prev.nativeBuildInputs ++ [ ];
+            runtimeLibs = prev.runtimeLibs ++ [ ];
           };
         };
       };
