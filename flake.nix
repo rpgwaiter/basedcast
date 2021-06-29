@@ -6,7 +6,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     devshell.url = "github:numtide/devshell";
-
   };
 
   outputs = inputs:
@@ -19,7 +18,7 @@
           #   env = prev.env ++ [];
           # };
           common = prev: {
-            buildInputs = prev.buildInputs ++ [ openssl wasm-pack ];
+            buildInputs = prev.buildInputs ++ [ ];
             nativeBuildInputs = prev.nativeBuildInputs ++ [ ];
             runtimeLibs = prev.runtimeLibs ++ [ ];
           };

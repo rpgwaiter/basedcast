@@ -1,6 +1,5 @@
 // This is used to update a running basedcast library
 // Eventually I'd like basedcast to scan for changes
-extern crate rayon;
 extern crate id3;
 extern crate mp3_duration;
 extern crate regex;
@@ -78,7 +77,6 @@ fn fill_song_info(s: &PathBuf) -> NewSong {
 }
 
 pub fn upsert_db(songs: &Vec<std::path::PathBuf>, pgpool: &PgPool) -> Option<String> {
-    use rayon::prelude::*;
     use indicatif::{ ProgressBar, ProgressStyle };
 
     let sty = ProgressStyle::default_bar()

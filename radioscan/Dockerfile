@@ -1,39 +1,26 @@
-# FROM lukemathwalker/cargo-chef as planner
-# WORKDIR /app
-# COPY . .
-# RUN cargo chef prepare --recipe-path recipe.json
-
-# FROM lukemathwalker/cargo-chef as cacher
-# WORKDIR /app
-# COPY --from=planner /app/recipe.json recipe.json
-# RUN cargo chef cook --release --recipe-path recipe.json
-
-# FROM rustlang/rust:nightly as builder
-# WORKDIR /app
-# COPY . .
-# # Copy over the cached dependencies
-# COPY --from=cacher /app/target target
-# COPY --from=cacher $CARGO_HOME $CARGO_HOME
-# RUN rustup default nightly && rustup update && cargo build --release --bin radioscan
-
-# FROM rustlang/rust:nightly-alpine as runtime
-# WORKDIR /app
-# COPY --from=builder /app/target/release/radioscan /usr/local/bin
-# ENTRYPOINT ["/usr/local/bin/radioscan"]
-
-FROM nixpkgs/nix-flakes:nixos-20.09 AS builder
+FROM lukemathwalker/cargo-chef as planner
 WORKDIR /app
-
-RUN nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
-RUN nix-channel --update
-
+RUN rustup update nightly && rustup default nightly && rm -rf $CARGO_HOME/registry/
 COPY . .
+RUN cargo chef prepare  --recipe-path recipe.json
 
-RUN nix build .#radioscan
-
-FROM rust
+FROM lukemathwalker/cargo-chef as cacher
 WORKDIR /app
+RUN rustup update nightly && rustup default nightly && rm -rf $CARGO_HOME/registry/
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
 
-COPY --from=builder /app/result/bin/radioscan .
+FROM lukemathwalker/cargo-chef as builder
+WORKDIR /app
+RUN rustup update nightly && rustup default nightly && rm -rf $CARGO_HOME/registry/
+COPY . .
+COPY --from=cacher /app/target target
+COPY --from=cacher /usr/local/cargo /usr/local/cargo
+RUN cargo build --release --bin radioscan
+
+FROM rust as runtime
+RUN rustup update nightly && rustup default nightly && rm -rf $CARGO_HOME/registry/
+WORKDIR /app
+COPY --from=builder /app/target/release/radioscan /usr/local/bin
 COPY settings.toml .
-ENTRYPOINT ["/app/radioscan"]
+ENTRYPOINT ["./usr/local/bin/radioscan"]

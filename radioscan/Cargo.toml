@@ -14,13 +14,12 @@ mpd = "*"
 
 id3 = "0.6.4"
 mp3-duration = "0.1.10"
-checksums = "0.7.1"
+checksums = "0.8.0"
 
 globwalk = "0.8.1"
-regex = "1.4.5"
-rayon = "1.5.0"
+regex = "1.5.4"
 
-indicatif = { version = "0.15" }
+indicatif = { version = "0.16.2" }
 #uuid = { version = "0.8.2", features = ["v4"] }
 
 

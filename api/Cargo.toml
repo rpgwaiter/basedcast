@@ -15,7 +15,7 @@ rocket = "0.4.2"
 diesel = { version = "1.4.3", features = ["postgres", "r2d2"] }
 # diesel-derive-enum = { version = "0.4", features = ["postgres"] }
 juniper = "0.14.1"
-juniper_rocket = "0.5.1"
+juniper_rocket = "0.5.2"
 lazy_static = "1.4.0"
 
 [package.metadata.nix]
