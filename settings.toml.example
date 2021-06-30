@@ -5,6 +5,7 @@ url = "http://localhost:8000/"
 url = "localhost"
 port = 6600
 radiofiles_root = "/radiofiles"
+password = "radio"
 
 [db]
 url = "postgres://radio:radio@localhost/radio" 

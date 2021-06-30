@@ -2,7 +2,7 @@
 use crate::db;
 use crate::db::Connection;
 use crate::graphql::{create_schema, Context, Schema};
-//use rocket::response::content;
+use rocket::response::content;
 use rocket::{Rocket, State};
 
 itconfig::config! {
@@ -13,27 +13,30 @@ itconfig::config! {
     }
 }
 
-// #[rocket::get("/")]
-// fn graphiql() -> content::Html<String> {
-//     let graphql_endpoint_url = config::ROCKET::BASE_URL() + "/graphql";
-//     juniper_rocket::graphiql_source(&graphql_endpoint_url)
-// }
+#[rocket::get("/")]
+fn graphiql() -> content::Html<String> {
+    println!("Attemting to get IQL");
+    let graphql_endpoint_url = config::ROCKET::BASE_URL() + "/graphql";
+    juniper_rocket::graphiql_source(&graphql_endpoint_url)
+}
 
-#[rocket::get("/?<request>")]
+#[rocket::get("/graphql?<request>")]
 fn get_graphql_handler(
     request: juniper_rocket::GraphQLRequest,
     schema: State<Schema>,
     db: Connection,
 ) -> juniper_rocket::GraphQLResponse {
+    println!("Request: {:#?}", &request);
     request.execute(&schema, &Context { connection: db })
 }
 
-#[rocket::post("/", data = "<request>")]
+#[rocket::post("/graphql", data = "<request>")]
 fn post_graphql_handler(
     request: juniper_rocket::GraphQLRequest,
     schema: State<Schema>,
     db: Connection,
 ) -> juniper_rocket::GraphQLResponse {
+    println!("Request: {:#?}", &request);
     request.execute(&schema, &Context { connection: db })
 }
 

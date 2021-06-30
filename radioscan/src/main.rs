@@ -90,7 +90,7 @@ pub fn upsert_db(songs: &Vec<std::path::PathBuf>, pgpool: &PgPool) -> Option<Str
     songs.into_iter().for_each(|songpath| {
         let songinfo = fill_song_info(songpath);
         Song::upsert(songinfo.clone(), &pgpool.get().unwrap()).ok();
-        pb.set_message(&format!("Scanned {:?}", songinfo.filename));
+        pb.set_message(format!("Scanned {:?}", songinfo.filename));
         pb.inc(1);
     });
     Some(format!("updated songs"))
@@ -105,12 +105,14 @@ fn main() {
         .as_str().unwrap();
     let radiofiles = get_radiofiles(root);
 
-    println!("{:#?}",Tag::read_from_path(&radiofiles[0]).unwrap().artist());
-
-    match mpc.login("password") { // Auth with MPD server
-        Ok(_client) => println!("Connected to MPD!"),
-        Err(error) => panic!("Unable to connect to mpd: {:?}", error),
-    };
+    if let Some(pass) = &conf.get("mpd").unwrap().get("password") {
+        match mpc.login(pass.as_str().unwrap()) {
+            Ok(_client) => println!("Connected to MPD!"),
+            Err(error) => panic!("Unable to connect to mpd: {:?}", error),
+        };
+    } else { 
+        println!("No password set in config. Skipping login")
+    }
     mpc.volume(100).unwrap();
     
     let conn = connect();
@@ -123,16 +125,13 @@ fn main() {
     let window: mpd::search::Window = (0u32, (size)).into();
     let finished = query.and(mpd::Term::LastMod, "0");
 
-    // adds all songs to the queue
+    // Adds all songs to the queue
     &mpc.find(finished, window).unwrap().iter().for_each(|x| {&mpc.push(x);});
     
-    // save queue as 'radio' playlist, del the old one
-    if mpc.playlist("radio").is_err() {
-        &mpc.save("radio");
-        println!("{:?} songs scanned!", &radiofiles.len());
-    } else {
-        &mpc.pl_remove("radio");
-        &mpc.save("radio");
-        println!("{:?} songs scanned!", &radiofiles.len());
+    // Save queue as 'radio' playlist, del the old one
+    if mpc.playlist("radio").is_ok() {
+         &mpc.pl_remove("radio");
     }
+    &mpc.save("radio");
+    println!("{:?} songs scanned!", &radiofiles.len());
 }

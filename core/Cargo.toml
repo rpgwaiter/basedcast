@@ -10,3 +10,4 @@ name = "basedcast_core"
 
 [dependencies]
 toml = "0.5"
+mpd = "*"
