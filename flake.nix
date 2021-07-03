@@ -11,6 +11,10 @@
 
   outputs = inputs:
     let
+      pink = "tput setaf 2 ";
+      green_bg = "tput setab 2";
+      reset = "tput sgr0";
+      devEcho = "${pink}; echo -n '[DEV] ';${reset}; echo ";
       outputs = inputs.nixCargoIntegration.lib.makeOutputs rec {
         root = ./.;
         buildPlatform = "crate2nix";
@@ -90,41 +94,56 @@
                   export PGDATA=$PGHOST/data
                   export PGDATABASE=postgres
                   export PGLOG=$PGHOST/postgres.log
-                  echo 'Killing any existing mpd/icecast'
-                  ${pkgs.killall}/bin/killall mpd 2> /dev/null # Probably could use some work
-                  ${pkgs.killall}/bin/killall icecast 2> /dev/null
+
+                  ${devEcho} "Killing any existing mpd/icecast"
+                  pgrep mpd | xargs kill > /dev/null 2>&1 && 
+                  pgrep icecast | xargs kill > /dev/null 2>&1 &&
                   sleep 1
 
                   run_dev() {
+                    ${devEcho} "Creating state directories.."
                     mkdir -p $PGHOST
-                    mkdir -p ${mpdRoot}/{playlists, tag_cache}
-                    mkdir -p ${icecastRoot}/logs
+                    mkdir -p '${mpdRoot}/playlists' '${icecastRoot}/logs'
 
                     if [ ! -d $PGDATA ]; then
+                      ${devEcho} "No postgres data found, creating database..."
                       initdb --auth=trust --no-locale --encoding=UTF8
                     fi
 
                     if ! pg_ctl status
                     then
+                      ${devEcho} "Starting postgres"
                       pg_ctl start -l $PGLOG -o "--unix_socket_directories='$PGHOST'"
                     fi
+
+                    ${devEcho} "Ensuring /radio database exists"
+                    createdb radio > /dev/null &&
+
+                    ${pkgs.diesel-cli}/bin/diesel migration run --database-url=postgres://localhost/radio
+                    ${pkgs.diesel-cli}/bin/diesel migration redo --database-url=postgres://localhost/radio
                     
+                    ${devEcho} "Starting Icecast.." > /dev/null
                     ${pkgs.icecast}/bin/icecast -b -c ${icecastConf}
-                    echo 'Started Icecast!'
+                    
                     sleep .5
+                    ${devEcho} "Starting MPD.."
                     ${pkgs.mpd}/bin/mpd ${mpdConf}
-                    echo 'Started MPD!'
+                    
                     sleep .5
+                    ${devEcho} "Populating MPD's playlist.."
                     ${pkgs.mpc_cli}/bin/mpc clear
-                    ${pkgs.mpc_cli}/bin/mpc ls |
+                    ${pkgs.mpc_cli}/bin/mpc listall |
                     ${pkgs.mpc_cli}/bin/mpc add
+                    ${devEcho} "Starting audio stream.."
                     ${pkgs.mpc_cli}/bin/mpc play
                     ${outputs.packages.x86_64-linux.radioscan}/bin/radioscan
+                    ${outputs.packages.x86_64-linux.basedcast_api}/bin/basedcast_api
                   }
 
                   trap 'run_dev' EXIT
                 '';
                 # ${outputs.packages.x86_64-linux.radioscan}/bin/radioscan
+                
             # env = prev.env ++ [];
               }];
           };

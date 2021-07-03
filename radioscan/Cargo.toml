@@ -22,6 +22,8 @@ regex = "1.5.4"
 indicatif = { version = "0.16.2" }
 #uuid = { version = "0.8.2", features = ["v4"] }
 
+rayon = { version = "1.5.1" }
+
 
 [package.metadata.nix]
 app = true

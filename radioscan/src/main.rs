@@ -39,7 +39,11 @@ fn parse_path(file: &PathBuf) -> (String, String, i32) {
     let system = splits.next().unwrap();
 
     let ginput = splits.next().unwrap();
-    let gex = Regex::new(r"(?P<game>.*)\((?P<year>\d{4})\)").unwrap(); //extract game and year from folder
+    // This regex may need tweaking as more edge case names pop up
+    let gex = Regex::new(r"(?x)
+        (?P<game>.*)\s{1}   # Game name, everything before the date
+        \((?P<year>\d{4})\) # Year, must be 4 digits in parenthesis
+        ").unwrap(); //extract game and year from folder
     let rxout = gex.captures(&ginput).unwrap();
     
     (system.to_string(),
@@ -78,6 +82,7 @@ fn fill_song_info(s: &PathBuf) -> NewSong {
 
 pub fn upsert_db(songs: &Vec<std::path::PathBuf>, pgpool: &PgPool) -> Option<String> {
     use indicatif::{ ProgressBar, ProgressStyle };
+    use rayon::prelude::*;
 
     let sty = ProgressStyle::default_bar()
         .template("{bar:40.green/yellow} {pos:>4}/{len:4} {msg}")
@@ -87,7 +92,7 @@ pub fn upsert_db(songs: &Vec<std::path::PathBuf>, pgpool: &PgPool) -> Option<Str
     pb.set_style(sty);
     pb.tick();
 
-    songs.into_iter().for_each(|songpath| {
+    songs.par_iter().for_each(|songpath| {
         let songinfo = fill_song_info(songpath);
         Song::upsert(songinfo.clone(), &pgpool.get().unwrap()).ok();
         pb.set_message(format!("Scanned {:?}", songinfo.filename));
@@ -116,6 +121,9 @@ fn main() {
     mpc.volume(100).unwrap();
     
     let conn = connect();
+    &conn.get().expect("Failed to get pooled connection");
+
+    
 
     upsert_db(&radiofiles, &conn).unwrap(); // scan files into db
 
