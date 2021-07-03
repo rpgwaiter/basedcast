@@ -15,21 +15,6 @@
         "type": "github"
       }
     },
-    "devshell_2": {
-      "locked": {
-        "lastModified": 1625086391,
-        "narHash": "sha256-IpNPv1v8s4L3CoxhwcgZIitGpcrnNgnj09X7TA0QV3k=",
-        "owner": "numtide",
-        "repo": "devshell",
-        "rev": "4b5ac7cf7d9a1cc60b965bb51b59922f2210cbc7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "devshell",
-        "type": "github"
-      }
-    },
     "flake-utils": {
       "locked": {
         "lastModified": 1623875721,
@@ -47,7 +32,7 @@
     },
     "nixCargoIntegration": {
       "inputs": {
-        "devshell": "devshell_2",
+        "devshell": "devshell",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -85,7 +70,6 @@
     },
     "root": {
       "inputs": {
-        "devshell": "devshell",
         "flake-utils": "flake-utils",
         "nixCargoIntegration": "nixCargoIntegration",
         "nixpkgs": "nixpkgs"

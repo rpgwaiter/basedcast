@@ -5,7 +5,6 @@
       url = "github:yusdacra/nix-cargo-integration";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    devshell.url = "github:numtide/devshell";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
