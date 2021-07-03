@@ -29,3 +29,11 @@ jobs:
         file: ./api/Dockerfile
         push: true
         tags: rpgwaiter/basedcast_api:latest
+    -
+      name: Build & Push Api
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./radioscan/Dockerfile
+        push: true
+        tags: rpgwaiter/basedcast_radioscan:latest
